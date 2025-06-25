@@ -1,9 +1,10 @@
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 
 import Button from "@/components/button.component";
 import FeatureCard from "@/components/feature-card.component";
+import Colors from "@/constants/colors";
 
 export default function Index() {
   const calender = require("@/assets/images/calender.png");
@@ -82,12 +83,14 @@ export default function Index() {
           </View>
         </View>
 
-        <Button
-          title="Get Started - Sign In"
-          onPress={() => router.push("/sign-in")}
-        />
+        <Button title="Get Started" onPress={() => router.push("/sign-in")} />
 
-        <Text style={styles.footer}>Powered by SlyTech</Text>
+        <Text style={styles.footer}>
+          Already have an account?{" "}
+          <Link href="/sign-in" style={styles.link}>
+            Sign in
+          </Link>
+        </Text>
       </View>
     </ScrollView>
   );
@@ -155,5 +158,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#999",
     textAlign: "center",
+  },
+  link: {
+    color: Colors.primary,
+    fontWeight: "bold",
   },
 });
