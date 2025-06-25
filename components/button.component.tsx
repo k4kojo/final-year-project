@@ -10,7 +10,7 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { primaryColor } from "@/constants/colors";
+import Color from "@/constants/colors";
 
 type ButtonProps = {
   title: string;
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   filledButton: {
-    backgroundColor: primaryColor,
+    backgroundColor: Color.primary,
   },
   plainButton: {
     backgroundColor: "#fff",

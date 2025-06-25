@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { router } from "expo-router";
 
@@ -9,7 +9,7 @@ export default function Index() {
   const calender = require("@/assets/images/calender.png");
   const video = require("@/assets/images/video.png");
   const prescription = require("@/assets/images/medical.png");
-  const sheild = require("@/assets/images/google_logo.png");
+  const shield = require("@/assets/images/shield.png");
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -41,7 +41,7 @@ export default function Index() {
           <FeatureCard
             title="Secure Records"
             description="Safe medical data"
-            icon={sheild}
+            icon={shield}
           />
         </View>
 
@@ -49,7 +49,10 @@ export default function Index() {
           <Text style={styles.sectionTitle}>Why Choose MediConnect?</Text>
 
           <View style={styles.bullet}>
-            <Text style={styles.bulletIcon}>🕒</Text>
+            <Image
+              source={require("@/assets/images/clock.png")}
+              style={styles.bulletIcon}
+            />
             <View>
               <Text style={styles.bulletTitle}>Save Time</Text>
               <Text style={styles.bulletSubtitle}>
@@ -125,6 +128,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     width: "100%",
+    marginTop: 20,
     marginBottom: 20,
   },
   bullet: {
@@ -133,6 +137,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   bulletIcon: {
+    width: 30,
+    height: 30,
     fontSize: 20,
     marginRight: 10,
     marginTop: 2,

@@ -1,15 +1,21 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  ImageSourcePropType,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 type Props = {
   title: string;
   description: string;
-  icon: string;
+  icon?: ImageSourcePropType;
 };
 
 const FeatureCard = ({ title, description, icon }: Props) => (
   <View style={styles.card}>
-    <Text style={styles.icon}>{icon}</Text>
+    {<Image source={icon} style={styles.icon} />}
     <Text style={styles.cardTitle}>{title}</Text>
     <Text style={styles.cardDescription}>{description}</Text>
   </View>
@@ -18,6 +24,7 @@ const FeatureCard = ({ title, description, icon }: Props) => (
 const styles = StyleSheet.create({
   card: {
     width: "47%",
+    height: "50%",
     padding: 15,
     borderRadius: 8,
     borderColor: "#e8e8e8",
@@ -26,18 +33,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   icon: {
-    fontSize: 24,
+    width: 40,
+    height: 40,
     marginBottom: 5,
   },
   cardTitle: {
     fontWeight: "bold",
     fontSize: 14,
     textAlign: "center",
+    paddingTop: 5,
   },
   cardDescription: {
     fontSize: 12,
     color: "#555",
     textAlign: "center",
+    marginTop: 5,
+    //paddingHorizontal: 10,
   },
 });
 

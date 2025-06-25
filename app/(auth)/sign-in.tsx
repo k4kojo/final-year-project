@@ -4,7 +4,7 @@ import { StyleSheet, Text, TextInput, View } from "react-native";
 import { Link, useRouter } from "expo-router";
 
 import Button from "@/components/button.component";
-import { primaryColor } from "@/constants/colors";
+import Color from "@/constants/colors";
 
 const SignIn = () => {
   const router = useRouter();
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   forgot: {
-    color: primaryColor,
+    color: Color.primary,
   },
   dividerContainer: {
     flexDirection: "row",
@@ -121,6 +121,6 @@ const styles = StyleSheet.create({
     color: "#444",
   },
   link: {
-    color: primaryColor,
+    color: Color.primary,
   },
 });
