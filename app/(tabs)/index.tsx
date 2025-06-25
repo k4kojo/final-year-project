@@ -1,13 +1,12 @@
-import Color from "@/constants/colors";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, View } from "react-native";
 
 export default function Index() {
   return (
     <View style={styles.container}>
       <View style={styles.topHeader}>
-        <FontAwesome6 name="menu-sandwich" size={24} color="white" />
-        <FontAwesome6 name="bell" size={24} color="white" />
+        <MaterialCommunityIcons name="menu" size={24} color="black" />
+        <MaterialCommunityIcons name="bell-outline" size={24} color="black" />
       </View>
     </View>
   );
@@ -17,6 +16,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    marginTop: 50,
   },
   topHeader: {
     flexDirection: "row",
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     height: 80,
     alignItems: "center",
     padding: 16,
-    backgroundColor: Color.primary,
+    // backgroundColor: Color.primary,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
   },
