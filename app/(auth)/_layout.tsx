@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 import React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 
@@ -18,11 +18,7 @@ export default function RootLayout() {
         <Text style={styles.appName}>MediConnect</Text>
         <Text style={styles.tagline}>Bringing healthcare to your doorstep</Text>
       </View>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-        <Stack.Screen name="sign-up" options={{ headerShown: false }} />
-      </Stack>
+      <Slot />
     </View>
   );
 }
