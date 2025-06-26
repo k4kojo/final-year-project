@@ -127,7 +127,7 @@ const SignUp = () => {
         </Pressable>
       )}
 
-      <View style={{ width: "100%", justifyContent: "space-between" }}>
+      <View style={{ width: "100%" }}>
         <CountryCodeDropdownPicker
           selected={selected}
           setSelected={setSelected}
@@ -232,8 +232,6 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontSize: 16,
     paddingHorizontal: 20,
-    paddingVertical: 10,
-    textAlign: "center",
   },
   countryCodePicker: {
     width: "100%",
