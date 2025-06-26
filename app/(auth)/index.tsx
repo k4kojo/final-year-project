@@ -83,7 +83,7 @@ export default function Index() {
           </View>
         </View>
 
-        <Button title="Get Started" onPress={() => router.push("/sign-in")} />
+        <Button title="Get Started" onPress={() => router.push("/sign-up")} />
 
         <Text style={styles.footer}>
           Already have an account?{" "}

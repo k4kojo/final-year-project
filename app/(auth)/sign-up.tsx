@@ -1,6 +1,8 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -8,14 +10,51 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import CountryCodeDropdownPicker from "react-native-dropdown-country-picker";
 
 import Button from "@/components/button.component";
+import Colors from "@/constants/colors";
 
 const SignUp = () => {
-  const router = useRouter();
-  const [agree, setAgree] = useState(false);
   const appleLogo = require("@/assets/images/apple_logo.png");
   const googleLogo = require("@/assets/images/google_logo.png");
+
+  const router = useRouter();
+  const [agree, setAgree] = useState(false);
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [selected, setSelected] = useState("+233"); // Default country code
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [password, setPassword] = useState("");
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const toggleDatePicker = () => {
+    setShowDatePicker(!showDatePicker);
+  };
+
+  interface DateChangeEvent {
+    type: "set" | "dismissed" | string;
+  }
+
+  const handleDateChange = (
+    event: DateChangeEvent,
+    selectedDate?: Date | undefined
+  ): void => {
+    if (event.type === "set") {
+      const currentDate = selectedDate as Date;
+      setDate(currentDate);
+    } else {
+      toggleDatePicker();
+    }
+  };
+
+  const confirmDate = () => {
+    setDateOfBirth(date.toLocaleDateString());
+    toggleDatePicker();
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -23,29 +62,93 @@ const SignUp = () => {
       <Text style={styles.subtitle}>Enter your email and password</Text>
 
       <TextInput
-        placeholder="First name"
+        placeholder="Full name"
+        placeholderTextColor={Colors.placeholder}
         style={styles.input}
         autoCapitalize="words"
-      />
-
-      <TextInput
-        placeholder="Last name"
-        style={styles.input}
-        autoCapitalize="words"
+        value={fullName}
+        onChangeText={setFullName}
       />
 
       <TextInput
         placeholder="email@example.com"
+        placeholderTextColor={Colors.placeholder}
         style={styles.input}
         keyboardType="email-address"
+        autoCapitalize="none"
+        value={email}
+        onChangeText={setEmail}
       />
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display="spinner"
+          onChange={handleDateChange}
+          style={{ height: 120, marginTop: -10 }}
+          textColor="#000"
+          minimumDate={new Date(1900, 0, 1)} // Set minimum date to January 1, 1900
+          maximumDate={new Date()} // Set maximum date to today
+        />
+      )}
+
+      {showDatePicker && (
+        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+          <TouchableOpacity onPress={toggleDatePicker}>
+            <Text style={styles.pickerButton}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={confirmDate}>
+            <Text
+              style={{
+                color: Colors.primary,
+                fontSize: 16,
+                paddingHorizontal: 20,
+              }}
+            >
+              Confirm
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {!showDatePicker && (
+        <Pressable onPress={toggleDatePicker} style={{ width: "100%" }}>
+          <TextInput
+            placeholder="Date of Birth"
+            placeholderTextColor={Colors.placeholder}
+            style={styles.input}
+            value={dateOfBirth}
+            onFocus={() => setShowDatePicker(true)}
+            onChangeText={setDateOfBirth}
+            editable={false}
+            onPressIn={toggleDatePicker} // Open date picker on press
+          />
+        </Pressable>
+      )}
+
+      <View style={{ width: "100%", justifyContent: "space-between" }}>
+        <CountryCodeDropdownPicker
+          selected={selected}
+          setSelected={setSelected}
+          phone={phoneNumber}
+          setPhone={setPhoneNumber}
+          style={styles.countryCodePicker}
+        />
+      </View>
+
       <TextInput
         placeholder="Create password"
+        placeholderTextColor={Colors.placeholder}
         style={styles.input}
+        value={password}
+        onChangeText={setPassword}
         secureTextEntry
       />
+
       <TextInput
         placeholder="Confirm password"
+        placeholderTextColor={Colors.placeholder}
         style={styles.input}
         secureTextEntry
       />
@@ -120,10 +223,26 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     padding: 12,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
     marginBottom: 12,
+  },
+  pickerButton: {
+    color: Colors.primary,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    textAlign: "center",
+  },
+  countryCodePicker: {
+    width: "100%",
+    marginBottom: 12,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: "#fff",
   },
   checkboxRow: {
     flexDirection: "row",
