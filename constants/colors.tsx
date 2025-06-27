@@ -6,6 +6,7 @@ const Colors = {
   inactive: "#828282",
   placeholder: "#B0B0B0",
   error: "#FF0000",
+  subtitle: "#555",
 };
 
 export default Colors;

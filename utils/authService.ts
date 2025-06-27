@@ -1,10 +1,11 @@
-import { auth } from "@/firebase/firebaseConfig";
+import { auth, db } from "@/firebase/firebaseConfig";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
+import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 
-// Helper function to sign up a user
+// Sign up user and store in Firestore
 export const signUpUser = async ({
   fullName,
   email,
@@ -19,27 +20,23 @@ export const signUpUser = async ({
   dateOfBirth: string;
 }) => {
   try {
-    // 1. Create user with Firebase Auth
+    // Create user
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
-
     const user = userCredential.user;
 
-    // // 2. Optionally update display name
-    // await updateProfile(user, { displayName: fullName });
-
-    // // 3. Create user document in Firestore
-    // await setDoc(doc(db, "users", user.uid), {
-    //   uid: user.uid,
-    //   fullName,
-    //   email,
-    //   phoneNumber,
-    //   dateOfBirth,
-    //   createdAt: new Date().toISOString(),
-    // });
+    // Save additional user info in Firestore
+    await setDoc(doc(db, "users", user.uid), {
+      uid: user.uid,
+      fullName,
+      email,
+      phoneNumber,
+      dateOfBirth,
+      createdAt: Timestamp.now(),
+    });
 
     return { success: true, user };
   } catch (error: any) {
@@ -47,7 +44,7 @@ export const signUpUser = async ({
   }
 };
 
-// Helper function to sign in a user
+// Sign in user and fetch Firestore profile
 export const signInUser = async (email: string, password: string) => {
   try {
     const userCredential = await signInWithEmailAndPassword(
@@ -55,10 +52,17 @@ export const signInUser = async (email: string, password: string) => {
       email,
       password
     );
-
     const user = userCredential.user;
 
-    return { success: true, user };
+    const userDocRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userDocRef);
+
+    if (!userSnap.exists()) {
+      return { success: false, error: "User profile not found in Firestore." };
+    }
+
+    const userData = userSnap.data();
+    return { success: true, user, userData };
   } catch (error: any) {
     return { success: false, error: error.message };
   }

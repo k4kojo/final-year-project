@@ -44,6 +44,9 @@ const SignInForm = () => {
         return;
       }
 
+      console.log("Signed in:", result.user);
+      console.log("User data from Firestore:", result.userData);
+
       router.push("/(tabs)");
     } catch (err: any) {
       alert("Unexpected error: " + err.message);

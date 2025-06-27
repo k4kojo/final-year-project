@@ -11,6 +11,7 @@ import {
 import PhoneInput from "react-native-phone-number-input";
 
 import Button from "@/components/button.component";
+import Colors from "@/constants/colors";
 import Divider from "../divider.component";
 import DatePickerField from "../inputs/datePickerField.component";
 import PhoneInputField from "../inputs/phoneInputField.component";
@@ -220,6 +221,7 @@ export default SignUpForm;
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "white",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 20,
@@ -230,7 +232,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    color: "#555",
+    color: Colors.subtitle,
     fontSize: 16,
     marginBottom: 20,
   },

@@ -1,41 +1,36 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { initializeApp } from "firebase/app";
 import {
-  createUserWithEmailAndPassword,
   getReactNativePersistence,
   initializeAuth,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
 } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
-// Firebase configuration
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCQ76slAFV1AAEymCrokEGMxB9u48w6Mxw",
   authDomain: "medi-connect-app-70848.firebaseapp.com",
   projectId: "medi-connect-app-70848",
-  storageBucket: "medi-connect-app-70848.firebasestorage.app",
+  storageBucket: "medi-connect-app-70848.appspot.com", // fixed `.firebasestorage.app` typo
   messagingSenderId: "608389858171",
   appId: "1:608389858171:web:10c7af54ad1f5edb5e73de",
 };
 
-// Initialize Firebase
+// Initialize app
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase Auth with persistent storage
+// Setup Auth with AsyncStorage persistence
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
 
-// Listen for auth state changes
+// Firestore reference
+const db = getFirestore(app);
+
+// Auth state change listener
 const subscribeToAuth = (callback: (user: any) => void) => {
-  return onAuthStateChanged(auth, (user) => {
-    callback(user);
-  });
+  return onAuthStateChanged(auth, callback);
 };
 
-export {
-  auth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  subscribeToAuth,
-};
+export { auth, db, subscribeToAuth };
