@@ -16,6 +16,7 @@ import DatePickerField from "../inputs/datePickerField.component";
 import PhoneInputField from "../inputs/phoneInputField.component";
 import TextInputField from "../inputs/textInputField.component";
 
+import { signUpUser } from "@/utils/authService";
 import { validateAuth } from "@/utils/validateAuth";
 
 const SignUpForm = () => {
@@ -72,7 +73,7 @@ const SignUpForm = () => {
   };
 
   // Form submission with validation
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const rawErrors = validateAuth(
       {
         fullName,
@@ -99,6 +100,19 @@ const SignUpForm = () => {
 
     const hasError = Object.values(newErrors).some((msg) => msg !== "");
     if (hasError) return;
+
+    const result = await signUpUser({
+      fullName,
+      email,
+      password,
+      phoneNumber,
+      dateOfBirth,
+    });
+
+    if (!result.success) {
+      alert("Sigh up failed: " + result.error);
+      return;
+    }
 
     router.push("/(tabs)");
   };
