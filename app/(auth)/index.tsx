@@ -1,6 +1,6 @@
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 
 import Button from "@/components/button.component";
 import FeatureCard from "@/components/feature-card.component";
@@ -87,9 +87,14 @@ export default function Index() {
 
         <Text style={styles.footer}>
           Already have an account?{" "}
-          <Link href="/sign-in" style={styles.link}>
+          <Text
+            onPress={() => {
+              router.push("/(auth)/sign-in");
+            }}
+            style={styles.link}
+          >
             Sign in
-          </Link>
+          </Text>
         </Text>
       </View>
     </ScrollView>
