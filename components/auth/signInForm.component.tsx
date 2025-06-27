@@ -6,6 +6,7 @@ import Button from "@/components/button.component";
 import Divider from "@/components/divider.component";
 import TextInputField from "@/components/inputs/textInputField.component";
 
+import { signInUser } from "@/utils/authService";
 import { validateAuth } from "@/utils/validateAuth";
 
 const SignInForm = () => {
@@ -16,13 +17,14 @@ const SignInForm = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [errors, setErrors] = useState({
     email: "",
     password: "",
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const rawErrors = validateAuth({ email, password }, "signin");
     const newErrors = {
       email: rawErrors.email ?? "",
@@ -33,7 +35,21 @@ const SignInForm = () => {
     const hasError = Object.values(newErrors).some((msg) => msg !== "");
     if (hasError) return;
 
-    router.push("/(tabs)");
+    try {
+      setLoading(true);
+      const result = await signInUser(email, password);
+
+      if (!result.success) {
+        alert("Sign in failed: " + result.error);
+        return;
+      }
+
+      router.push("/(tabs)");
+    } catch (err: any) {
+      alert("Unexpected error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,7 +78,11 @@ const SignInForm = () => {
         error={errors.password}
       />
 
-      <Button title="Sign in" onPress={handleSubmit} />
+      <Button
+        title={loading ? "Signing in..." : "Sign in"}
+        onPress={handleSubmit}
+        disabled={loading}
+      />
 
       <View style={styles.forgotContainer}>
         <TouchableOpacity onPress={() => router.push("/(forgot)/index")}>

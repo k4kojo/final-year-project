@@ -55,7 +55,10 @@ export const signInUser = async (email: string, password: string) => {
       email,
       password
     );
-    return { success: true, user: userCredential.user };
+
+    const user = userCredential.user;
+
+    return { success: true, user };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
