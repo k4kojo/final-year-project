@@ -1,9 +1,9 @@
 // Imports
 import React from "react";
 
-import SignUpForm from "@/components/auth/SignUpForm.component";
+import AuthForm from "@/components/auth/authForm";
 
 // SignUp component for user registration
 export default function SignUp() {
-  return <SignUpForm />;
+  return <AuthForm type="signup" />;
 }
