@@ -1,6 +1,8 @@
+// Imports
 import DateTimePicker from "@react-native-community/datetimepicker";
+import * as Localization from "expo-localization";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -10,31 +12,54 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import CountryCodeDropdownPicker from "react-native-dropdown-country-picker";
+import PhoneInput from "react-native-phone-number-input";
 
 import Button from "@/components/button.component";
 import Colors from "@/constants/colors";
 
+// SignUp component for user registration
 const SignUp = () => {
+  // OAuth logo assets
   const appleLogo = require("@/assets/images/apple_logo.png");
   const googleLogo = require("@/assets/images/google_logo.png");
 
+  // Navigation
   const router = useRouter();
+  // Agreement checkbox state
   const [agree, setAgree] = useState(false);
 
+  // Form field states
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [selected, setSelected] = useState("+233"); // Default country code
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Phone input ref and country code
+  const phoneInput = useRef<PhoneInput>(null);
+  const PhoneInputComponent = PhoneInput as any;
+  const countryCode = Localization.getLocales()[0]?.countryCode ?? "GH";
+
+  // Date picker state
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  // Error messages for form fields
+  const [errors, setErrors] = useState({
+    fullName: "",
+    email: "",
+    dateOfBirth: "",
+    phoneNumber: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  // Toggle date picker visibility
   const toggleDatePicker = () => {
     setShowDatePicker(!showDatePicker);
   };
-
+  // Handle date selction
   interface DateChangeEvent {
     type: "set" | "dismissed" | string;
   }
@@ -51,16 +76,42 @@ const SignUp = () => {
     }
   };
 
+  // Confirm and display slected date
   const confirmDate = () => {
     setDateOfBirth(date.toLocaleDateString());
     toggleDatePicker();
   };
 
+  // Form submission with validation
+  const handleErrorMessage = () => {
+    const newErrors = {
+      fullName: fullName ? "" : "Full name is required",
+      email: email.includes("@") ? "" : "Enter a valid email",
+      phoneNumber: phoneInput.current?.isValidNumber(phoneNumber)
+        ? ""
+        : "Invalid phone number",
+      password:
+        password.length >= 6 ? "" : "Password must be at least 6 characters",
+      confirmPassword:
+        confirmPassword === password ? "" : "Passwords do not match",
+      dateOfBirth: dateOfBirth ? "" : "Date of birth is required",
+    };
+
+    setErrors(newErrors);
+
+    const hasError = Object.values(newErrors).some((msg) => msg !== "");
+    if (hasError) return;
+
+    router.push("/(tabs)");
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* {Title and subtitle} */}
       <Text style={styles.title}>Sign Up</Text>
       <Text style={styles.subtitle}>Enter your email and password</Text>
 
+      {/* Full name input */}
       <TextInput
         placeholder="Full name"
         placeholderTextColor={Colors.placeholder}
@@ -69,7 +120,11 @@ const SignUp = () => {
         value={fullName}
         onChangeText={setFullName}
       />
+      {errors.fullName ? (
+        <Text style={styles.errorText}>{errors.fullName}</Text>
+      ) : null}
 
+      {/* Email input */}
       <TextInput
         placeholder="email@example.com"
         placeholderTextColor={Colors.placeholder}
@@ -77,9 +132,16 @@ const SignUp = () => {
         keyboardType="email-address"
         autoCapitalize="none"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={(text) => {
+          setEmail(text);
+          if (errors.email) setErrors({ ...errors, email: "" });
+        }}
       />
+      {errors.email ? (
+        <Text style={styles.errorText}>{errors.email}</Text>
+      ) : null}
 
+      {/* Date of birth */}
       {showDatePicker && (
         <DateTimePicker
           value={date}
@@ -126,32 +188,62 @@ const SignUp = () => {
           />
         </Pressable>
       )}
+      {errors.dateOfBirth ? (
+        <Text style={styles.errorText}>{errors.dateOfBirth}</Text>
+      ) : null}
 
-      <View style={{ width: "100%" }}>
-        <CountryCodeDropdownPicker
-          selected={selected}
-          setSelected={setSelected}
-          phone={phoneNumber}
-          setPhone={setPhoneNumber}
-          style={styles.countryCodePicker}
-        />
-      </View>
+      {/* Phone number */}
+      <PhoneInputComponent
+        ref={phoneInput}
+        defaultValue={phoneNumber}
+        defaultCode={countryCode} // Default to Ghana; change as needed
+        layout="first"
+        onChangeFormattedText={(text: string) => {
+          setPhoneNumber(text);
+        }}
+        containerStyle={styles.phoneContainer}
+        textContainerStyle={styles.textInput}
+        textInputProps={{
+          placeholder: "Phone number",
+          placeholderTextColor: "#999",
+        }}
+      />
+      {errors.phoneNumber && (
+        <Text style={styles.errorText}>{errors.phoneNumber}</Text>
+      )}
 
+      {/* Password */}
       <TextInput
         placeholder="Create password"
         placeholderTextColor={Colors.placeholder}
         style={styles.input}
         value={password}
-        onChangeText={setPassword}
+        onChangeText={(text) => {
+          setPassword(text);
+          if (errors.password) setErrors({ ...errors, password: "" });
+        }}
         secureTextEntry
       />
+      {errors.password ? (
+        <Text style={styles.errorText}>{errors.password}</Text>
+      ) : null}
 
+      {/* Confirm password */}
       <TextInput
         placeholder="Confirm password"
         placeholderTextColor={Colors.placeholder}
         style={styles.input}
+        value={confirmPassword}
+        onChangeText={(text) => {
+          setConfirmPassword(text);
+          if (errors.confirmPassword)
+            setErrors({ ...errors, confirmPassword: "" });
+        }}
         secureTextEntry
       />
+      {errors.confirmPassword ? (
+        <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+      ) : null}
 
       {/* Custom checkbox with agreement */}
       <View style={styles.checkboxRow}>
@@ -167,9 +259,10 @@ const SignUp = () => {
         </Text>
       </View>
 
+      {/* Submit button */}
       <Button
         title="Sign up"
-        onPress={() => router.push("/(tabs)")}
+        onPress={handleErrorMessage}
         disabled={!agree}
         style={
           !agree
@@ -179,12 +272,14 @@ const SignUp = () => {
         textStyle={!agree ? styles.disabledText : undefined}
       />
 
+      {/* Divider */}
       <View style={styles.dividerContainer}>
         <View style={styles.divider} />
         <Text style={styles.orText}>or</Text>
         <View style={styles.divider} />
       </View>
 
+      {/* OAuth buttons */}
       <Button
         icon={googleLogo}
         title=" Sign up with Google"
@@ -209,7 +304,8 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     backgroundColor: "#fff",
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   title: {
     fontSize: 22,
@@ -233,14 +329,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingHorizontal: 20,
   },
-  countryCodePicker: {
+  phoneContainer: {
     width: "100%",
-    marginBottom: 12,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: "#fff",
+    height: 50,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    backgroundColor: "transparent",
+  },
+  textInput: {
+    backgroundColor: "transparent",
+    paddingVertical: 0,
   },
   checkboxRow: {
     flexDirection: "row",
@@ -269,6 +367,12 @@ const styles = StyleSheet.create({
   link: {
     color: "#2563EB",
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 8,
+    alignSelf: "flex-start",
   },
   dividerContainer: {
     flexDirection: "row",
