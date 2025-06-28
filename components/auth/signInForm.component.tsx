@@ -47,7 +47,7 @@ const SignInForm = () => {
       console.log("Signed in:", result.user);
       console.log("User data from Firestore:", result.userData);
 
-      router.push("/(tabs)");
+      router.push("/tabs");
     } catch (err: any) {
       alert("Unexpected error: " + err.message);
     } finally {
@@ -88,7 +88,7 @@ const SignInForm = () => {
       />
 
       <View style={styles.forgotContainer}>
-        <TouchableOpacity onPress={() => router.push("/(forgot)/index")}>
+        <TouchableOpacity onPress={() => router.push("/resetPassword")}>
           <Text style={styles.link}>Forgot password?</Text>
         </TouchableOpacity>
       </View>

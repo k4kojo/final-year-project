@@ -115,7 +115,7 @@ const SignUpForm = () => {
       return;
     }
 
-    router.push("/(tabs)");
+    router.push("/tabs");
   };
 
   return (
