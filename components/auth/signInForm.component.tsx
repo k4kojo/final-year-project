@@ -6,6 +6,7 @@ import Button from "@/components/button.component";
 import Divider from "@/components/divider.component";
 import TextInputField from "@/components/inputs/textInputField.component";
 
+import Colors from "@/constants/colors";
 import { signInUser } from "@/utils/authService";
 import { validateAuth } from "@/utils/validateAuth";
 
@@ -88,8 +89,8 @@ const SignInForm = () => {
       />
 
       <View style={styles.forgotContainer}>
-        <TouchableOpacity onPress={() => router.push("/resetPassword")}>
-          <Text style={styles.link}>Forgot password?</Text>
+        <TouchableOpacity onPress={() => router.push("/accountRecovery")}>
+          <Text style={styles.link}>Forgot your password?</Text>
         </TouchableOpacity>
       </View>
 
@@ -148,12 +149,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   footerText: {
-    fontSize: 13,
+    fontSize: 15,
     marginTop: 20,
-    color: "#444",
   },
   link: {
-    color: "#2563EB",
+    color: Colors.primary,
     fontWeight: "600",
   },
 });

@@ -160,12 +160,12 @@ const styles = StyleSheet.create({
     color: "#555",
   },
   footer: {
-    fontSize: 12,
-    color: "#999",
+    fontSize: 15,
+    //color: "#999",
     textAlign: "center",
   },
   link: {
     color: Colors.primary,
-    fontWeight: "bold",
+    //fontWeight: "bold",
   },
 });

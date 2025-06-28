@@ -213,6 +213,13 @@ const SignUpForm = () => {
         onPress={() => console.log("Apple Signed In")}
         plain
       />
+
+      <Text style={styles.footerText}>
+        Already have an account?{" "}
+        <Text style={styles.link} onPress={() => router.replace("/sign-in")}>
+          Sign in
+        </Text>
+      </Text>
     </ScrollView>
   );
 };
@@ -255,14 +262,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   checkboxText: {
-    fontSize: 12,
+    fontSize: 13,
     color: "#333",
     flex: 1,
     flexWrap: "wrap",
   },
   link: {
-    color: "#2563EB",
-    fontWeight: "bold",
+    color: Colors.primary,
+    //fontWeight: "bold",
   },
   oauthButton: {
     padding: 12,
@@ -272,4 +279,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignItems: "center",
   },
+  footerText: {
+    fontSize: 15,
+    marginVertical: 10,
+  },
+  // link: {
+  //   color: "#2563EB",
+  //   fontWeight: "bold",
+  // },
 });
