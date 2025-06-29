@@ -4,7 +4,7 @@
     "slug": "medi_connect_app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/stethoscope.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "mediconnectapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
