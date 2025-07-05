@@ -1,8 +1,8 @@
 import AppointmentSection from "@/components/appointment-section.component";
 import FeatureCard from "@/components/feature-card.component";
-import Colors from "@/constants/colors";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import HealthTips from "@/components/health-tips.component";
+import TopHeader from "@/components/top-header.component";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -16,112 +16,108 @@ const Dashboard = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulated fetch from API
     fetchUserProfile();
   }, []);
 
   const fetchUserProfile = async () => {
     try {
-      const response = await fetch("https://randomuser.me/api/"); // replace with your API
+      const response = await fetch("https://randomuser.me/api/");
       const data = await response.json();
+      const imageUrl = data?.results?.[0]?.picture?.medium;
 
-      if (data?.profileImageUrl) {
-        setProfileImage(data.profileImageUrl);
+      if (imageUrl) {
+        setProfileImage(imageUrl);
       } else {
         setProfileImage(null);
       }
     } catch (error) {
       console.log("Error fetching profile:", error);
-      setProfileImage(null); // fallback
+      setProfileImage(null);
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Welcome Card */}
-      <View style={styles.welcomeCard}>
-        <View style={styles.userInfo}>
-          <Text style={styles.welcomeText}>Welcome Sylvester!</Text>
-          {profileImage ? (
-            <Image source={{ uri: profileImage }} style={styles.avatar} />
-          ) : (
-            <View style={[styles.avatar, styles.avatarFallback]}>
-              <Ionicons name="person" size={24} color="#888" />
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+      <TopHeader
+        screen="home"
+        onLeftPress={() => console.log("menu")}
+        onRightPress={() => console.log("bell-outline")}
+      />
+
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Welcome Card */}
+        <View style={styles.welcomeCard}>
+          <View style={styles.userInfo}>
+            <Text style={styles.welcomeText}>Welcome Sylvester!</Text>
+            {profileImage ? (
+              <Image source={{ uri: profileImage }} style={styles.avatar} />
+            ) : (
+              <View style={[styles.avatar, styles.avatarFallback]}>
+                <Ionicons name="person" size={24} color="#888" />
+              </View>
+            )}
+          </View>
+          <View style={styles.welcomeSummary}>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryNumber}>0</Text>
+              <Text style={styles.summaryLabel}>Upcoming appointments</Text>
             </View>
-          )}
-        </View>
-        <View style={styles.welcomeSummary}>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNumber}>0</Text>
-            <Text style={styles.summaryLabel}>Upcoming appointments</Text>
-          </View>
-          <View style={styles.summaryItem}>
-            <Text style={styles.summaryNumber}>0</Text>
-            <Text style={styles.summaryLabel}>Records</Text>
+            <View style={styles.summaryItem}>
+              <Text style={styles.summaryNumber}>0</Text>
+              <Text style={styles.summaryLabel}>Records</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Quick Actions */}
-      <Text style={styles.sectionTitle}>Quick actions</Text>
-      <View style={styles.actionsGrid}>
-        <FeatureCard
-          icon={calendar}
-          title="Book Appointment"
-          description=""
-          pressable
-          onPress={() => router.replace("/tabs/appointment")}
-        />
-        <FeatureCard
-          icon={video}
-          title="Join Consultation"
-          description=""
-          pressable
-          onPress={() => router.replace("/tabs/consultation")}
-        />
-        <FeatureCard
-          icon={testTube}
-          title="Lab Results"
-          description=""
-          pressable
-          onPress={() => router.replace("/tabs/records")}
-        />
-        <FeatureCard
-          icon={prescription}
-          title="Prescription"
-          description=""
-          pressable
-          onPress={() => router.replace("/tabs/records")}
-        />
-      </View>
-
-      {/* Upcoming Appointments */}
-      <AppointmentSection
-        title="Upcoming appointments"
-        emptyMessage="No upcoming appointments"
-      />
-
-      <AppointmentSection
-        title="Recent prescription"
-        emptyMessage="No recent prescriptions"
-      />
-
-      <LinearGradient
-        colors={["#e3ffe7", "#d9e7ff"]} // Light green horizontal gradient
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.healthTips}
-      >
-        <MaterialCommunityIcons name="circle" size={50} color="green" />
-        <View style={styles.tip}>
-          <Text style={styles.title}>Stay Hydrated</Text>
-          <Text style={styles.subtitle}>
-            Drink at least 8 glasses of water daily to maintain good health and
-            support your immune system
-          </Text>
+        {/* Quick Actions */}
+        <Text style={styles.sectionTitle}>Quick actions</Text>
+        <View style={styles.actionsGrid}>
+          <FeatureCard
+            icon={calendar}
+            title="Book Appointment"
+            description=""
+            pressable
+            onPress={() => router.replace("/tabs/appointment")}
+          />
+          <FeatureCard
+            icon={video}
+            title="Join Consultation"
+            description=""
+            pressable
+            onPress={() => router.replace("/tabs/consultation")}
+          />
+          <FeatureCard
+            icon={testTube}
+            title="Lab Results"
+            description=""
+            pressable
+            onPress={() => router.replace("/tabs/records")}
+          />
+          <FeatureCard
+            icon={prescription}
+            title="Prescription"
+            description=""
+            pressable
+            onPress={() => router.replace("/tabs/records")}
+          />
         </View>
-      </LinearGradient>
-    </ScrollView>
+
+        {/* Sections */}
+        <AppointmentSection
+          title="Upcoming appointments"
+          emptyMessage="No upcoming appointments"
+        />
+        <AppointmentSection
+          title="Recent prescription"
+          emptyMessage="No recent prescriptions"
+        />
+
+        {/* Health Tips */}
+        <View style={{ marginTop: 30 }}>
+          <HealthTips />
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -134,10 +130,8 @@ const styles = StyleSheet.create({
   welcomeCard: {
     backgroundColor: "#fff",
     padding: 20,
-    marginTop: -10,
+    marginTop: -20,
     borderRadius: 16,
-    // borderColor: "#ddd",
-    // borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.05,
@@ -176,17 +170,12 @@ const styles = StyleSheet.create({
   summaryNumber: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "green", // Optional highlight color
+    color: "green",
   },
-
   summaryLabel: {
     fontSize: 14,
     color: "gray",
     textAlign: "center",
-  },
-  subText: {
-    color: "#555",
-    fontSize: 14,
   },
   sectionTitle: {
     fontSize: 17,
@@ -198,30 +187,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-  },
-  appointmentSection: {
-    marginTop: 30,
-  },
-  prescriptionSection: {
-    marginTop: 30,
-  },
-  appointmentTitle: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  viewAll: {
-    color: Colors.primary,
-    fontWeight: "500",
-    fontSize: 14,
-    marginBottom: -23,
-  },
-  noAppointmentsBox: {
-    backgroundColor: "#F5F5F5",
-    borderRadius: 10,
-    paddingVertical: 20,
-    alignItems: "center",
-    marginTop: 10,
   },
   healthTips: {
     flexDirection: "row",

@@ -1,48 +1,40 @@
 import Colors from "@/constants/colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
-  leftIconName?: string;
-  rightIconName?: string;
-  title?: string;
-  iconColor?: string;
-  iconSize?: number;
+  screen?: "home" | "appointments" | "consult" | "records" | "profile";
   onLeftPress?: () => void;
   onRightPress?: () => void;
 };
 
 export default function TopHeader({
-  leftIconName,
-  rightIconName,
-  title,
-  iconColor = "#fff",
-  iconSize = 24,
+  screen,
   onLeftPress,
   onRightPress,
 }: Props) {
   return (
     <View style={styles.topHeader}>
-      <View style={styles.leftSection}>
-        {leftIconName && (
+      {screen === "home" ? (
+        <>
           <TouchableOpacity onPress={onLeftPress}>
+            <MaterialCommunityIcons name="menu" size={26} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onRightPress}>
             <MaterialCommunityIcons
-              name={leftIconName as any}
-              size={iconSize}
-              color={iconColor}
+              name="bell-outline"
+              size={26}
+              color="#fff"
             />
           </TouchableOpacity>
-        )}
-        {title && <Text style={styles.title}>{title}</Text>}
-      </View>
-      {rightIconName && (
-        <TouchableOpacity onPress={onRightPress}>
-          <MaterialCommunityIcons
-            name={rightIconName as any}
-            size={iconSize}
-            color={iconColor}
-          />
-        </TouchableOpacity>
+        </>
+      ) : (
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>
+            {(screen ?? "").charAt(0).toUpperCase() + (screen ?? "").slice(1)}
+          </Text>
+        </View>
       )}
     </View>
   );
@@ -51,22 +43,26 @@ export default function TopHeader({
 const styles = StyleSheet.create({
   topHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
+    justifyContent: "space-between",
     height: "18%",
     paddingHorizontal: 20,
     paddingTop: 50,
     backgroundColor: Colors.primary,
   },
-  leftSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+  homeTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  titleContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "flex-start",
   },
   title: {
-    fontSize: 20,
-    color: "#fff",
+    fontSize: 30,
     fontWeight: "bold",
+    color: "#fff",
   },
 });
