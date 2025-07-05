@@ -1,5 +1,6 @@
 import tipsData from "@/utils/scripts/tips.json";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -52,19 +53,21 @@ const HealthTips = () => {
   }, []);
 
   // Auto scroll effect
+  const isFocused = useIsFocused(); // this tells us if the screen is active
+
   useEffect(() => {
-    if (!tips.length || isUserInteracting) return;
+    if (!tips.length || isUserInteracting || !isFocused) return;
 
     intervalRef.current = setInterval(() => {
       const nextIndex = (activeIndex + 1) % tips.length;
-      listRef.current?.scrollToIndex({ index: nextIndex, animated: true });
       setActiveIndex(nextIndex);
+      listRef.current?.scrollToIndex({ index: nextIndex, animated: true });
     }, 10000);
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [activeIndex, tips, isUserInteracting]);
+  }, [activeIndex, tips, isUserInteracting, isFocused]);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
