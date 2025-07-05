@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Animated,
   Image,
   ImageSourcePropType,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -11,30 +13,77 @@ type Props = {
   title: string;
   description: string;
   icon?: ImageSourcePropType;
+  pressable?: boolean;
+  onPress?: () => void;
 };
 
-const FeatureCard = ({ title, description, icon }: Props) => (
-  <View style={styles.card}>
-    {<Image source={icon} style={styles.icon} />}
-    <Text style={styles.cardTitle}>{title}</Text>
-    <Text style={styles.cardDescription}>{description}</Text>
-  </View>
-);
+const FeatureCard = ({
+  title,
+  description,
+  icon,
+  pressable,
+  onPress,
+}: Props) => {
+  const scale = useState(new Animated.Value(1))[0];
+
+  const animateIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.95,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const animateOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      friction: 3,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const CardContent = (
+    <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
+      {icon && <Image source={icon} style={styles.icon} />}
+      <Text style={styles.cardTitle}>{title}</Text>
+      {description ? (
+        <Text style={styles.cardDescription}>{description}</Text>
+      ) : null}
+    </Animated.View>
+  );
+
+  if (pressable) {
+    return (
+      <Pressable
+        onPress={onPress}
+        onPressIn={animateIn}
+        onPressOut={animateOut}
+        style={{ width: "47%" }}
+      >
+        {CardContent}
+      </Pressable>
+    );
+  }
+
+  return <View style={{ width: "47%" }}>{CardContent}</View>;
+};
 
 const styles = StyleSheet.create({
   card: {
-    width: "47%",
-    height: "50%",
+    height: 140,
     padding: 15,
-    borderRadius: 8,
-    borderColor: "#e8e8e8",
-    borderWidth: 1,
-    marginVertical: 5,
+    borderRadius: 16,
+    backgroundColor: "#fff",
+    marginVertical: 10,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 6,
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     marginBottom: 5,
   },
   cardTitle: {
@@ -48,7 +97,6 @@ const styles = StyleSheet.create({
     color: "#555",
     textAlign: "center",
     marginTop: 5,
-    //paddingHorizontal: 10,
   },
 });
 

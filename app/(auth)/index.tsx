@@ -7,7 +7,7 @@ import FeatureCard from "@/components/feature-card.component";
 import Colors from "@/constants/colors";
 
 export default function Index() {
-  const calender = require("@/assets/images/calender.png");
+  const calender = require("@/assets/images/calendar.png");
   const video = require("@/assets/images/video.png");
   const prescription = require("@/assets/images/medical.png");
   const shield = require("@/assets/images/shield.png");
