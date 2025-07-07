@@ -148,6 +148,8 @@ const SignUpForm = () => {
         onConfirm={confirmDate}
         displayDate={dateOfBirth}
         error={errors.dateOfBirth}
+        minimumDate={new Date(1900, 0, 1)}
+        maximumDate={new Date()}
       />
 
       <PhoneInputField

@@ -17,6 +17,10 @@ type Props = {
   onConfirm: () => void;
   displayDate: string;
   error?: string;
+  inputStyles?: object;
+  placeholder?: string;
+  minimumDate?: Date;
+  maximumDate?: Date;
 };
 
 export default function DatePickerField({
@@ -27,6 +31,10 @@ export default function DatePickerField({
   onConfirm,
   displayDate,
   error,
+  inputStyles,
+  placeholder,
+  minimumDate,
+  maximumDate,
 }: Props) {
   return (
     <View style={styles.container}>
@@ -38,8 +46,8 @@ export default function DatePickerField({
             display="spinner"
             onChange={onChange}
             style={{ height: 120 }}
-            minimumDate={new Date(1900, 0, 1)}
-            maximumDate={new Date()}
+            minimumDate={minimumDate}
+            maximumDate={maximumDate}
           />
           <View style={styles.buttonRow}>
             <TouchableOpacity onPress={onToggle}>
@@ -54,9 +62,9 @@ export default function DatePickerField({
       {!show && (
         <Pressable onPress={onToggle}>
           <TextInput
-            style={styles.input}
-            value={displayDate}
-            placeholder="Date of Birth"
+            style={[styles.input, inputStyles]}
+            value={displayDate || ""}
+            placeholder={placeholder}
             placeholderTextColor="#999"
             editable={false}
             onPressIn={onToggle}
