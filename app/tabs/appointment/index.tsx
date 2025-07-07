@@ -1,6 +1,7 @@
 import AppointmentCard from "@/components/appointment-card.component";
 import Button from "@/components/button.component";
 import TopHeader from "@/components/top-header.component";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
@@ -84,7 +85,7 @@ const Appointments = () => {
         <View style={{ marginTop: 20 }}>
           <Button
             title="Schedule appointment"
-            onPress={() => console.log("Schedule appointment")}
+            onPress={() => router.push("/tabs/appointment/schedule")}
           />
         </View>
       </ScrollView>
