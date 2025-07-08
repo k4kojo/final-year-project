@@ -25,7 +25,7 @@ const DataCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#f9fafb", // Tailwind Gray-100
+    backgroundColor: "#f9fafb",
     borderRadius: 12,
     padding: 16,
     marginBottom: 30,

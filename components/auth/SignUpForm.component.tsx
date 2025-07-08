@@ -155,6 +155,7 @@ const SignUpForm = () => {
       <DatePickerField
         show={showDatePicker}
         date={date}
+        placeholder="Date of Birth"
         onToggle={toggleDatePicker}
         onChange={handleDateChange}
         onConfirm={confirmDate}
