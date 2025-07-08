@@ -4,7 +4,8 @@ interface AuthInputs {
   email: string;
   password: string;
   confirmPassword?: string;
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   dateOfBirth?: string;
   phoneNumber?: string;
 }
@@ -13,7 +14,8 @@ interface AuthErrors {
   email?: string;
   password?: string;
   confirmPassword?: string;
-  fullName?: string;
+  firstName?: string;
+  lastName?: string;
   dateOfBirth?: string;
   phoneNumber?: string;
 }
@@ -30,7 +32,9 @@ export function validateAuth(form: AuthInputs, type: AuthFormType): AuthErrors {
   }
 
   if (type === "signup") {
-    if (!form.fullName) errors.fullName = "Full name is required";
+    if (!form.firstName) errors.firstName = "First name is required";
+
+    if (!form.lastName) errors.lastName = "Last name is required";
 
     if (!form.dateOfBirth) errors.dateOfBirth = "Date of birth is required";
 

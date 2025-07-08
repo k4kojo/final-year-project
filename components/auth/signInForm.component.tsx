@@ -7,8 +7,8 @@ import Divider from "@/components/divider.component";
 import TextInputField from "@/components/inputs/textInputField.component";
 
 import Colors from "@/constants/colors";
-import { signInUser } from "@/utils/authService";
-import { validateAuth } from "@/utils/validateAuth";
+import { signInUser } from "@/firebase/authService";
+import { validateAuth } from "@/firebase/validateAuth";
 
 const SignInForm = () => {
   const router = useRouter();

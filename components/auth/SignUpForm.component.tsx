@@ -17,8 +17,8 @@ import DatePickerField from "../inputs/datePickerField.component";
 import PhoneInputField from "../inputs/phoneInputField.component";
 import TextInputField from "../inputs/textInputField.component";
 
-import { signUpUser } from "@/utils/authService";
-import { validateAuth } from "@/utils/validateAuth";
+import { signUpUser } from "@/firebase/authService";
+import { validateAuth } from "@/firebase/validateAuth";
 
 const SignUpForm = () => {
   // OAuth logo assets
@@ -36,7 +36,8 @@ const SignUpForm = () => {
   const [agree, setAgree] = useState(false);
 
   // Form field states
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -47,7 +48,8 @@ const SignUpForm = () => {
 
   // Error messages for form fields
   const [errors, setErrors] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     dateOfBirth: "",
     phoneNumber: "",
@@ -77,7 +79,8 @@ const SignUpForm = () => {
   const handleSubmit = async () => {
     const rawErrors = validateAuth(
       {
-        fullName,
+        firstName,
+        lastName,
         email,
         phoneNumber,
         dateOfBirth,
@@ -89,7 +92,8 @@ const SignUpForm = () => {
 
     // Ensure all error fields are strings
     const newErrors = {
-      fullName: rawErrors.fullName ?? "",
+      firstName: rawErrors.firstName ?? "",
+      lastName: rawErrors.lastName ?? "",
       email: rawErrors.email ?? "",
       dateOfBirth: rawErrors.dateOfBirth ?? "",
       phoneNumber: rawErrors.phoneNumber ?? "",
@@ -103,7 +107,8 @@ const SignUpForm = () => {
     if (hasError) return;
 
     const result = await signUpUser({
-      fullName,
+      firstName,
+      lastName,
       email,
       password,
       phoneNumber,
@@ -124,10 +129,17 @@ const SignUpForm = () => {
       <Text style={styles.subtitle}>Fill out the form to get started</Text>
 
       <TextInputField
-        placeholder="Full name"
-        value={fullName}
-        onChangeText={setFullName}
-        error={errors.fullName}
+        placeholder="First name"
+        value={firstName}
+        onChangeText={setFirstName}
+        error={errors.firstName}
+      />
+
+      <TextInputField
+        placeholder="Last name"
+        value={lastName}
+        onChangeText={setLastName}
+        error={errors.lastName}
       />
 
       <TextInputField
