@@ -6,6 +6,17 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 
+// User profile interface for type safety
+export interface UserProfile {
+  uid: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  dateOfBirth: string;
+  createdAt: Timestamp;
+}
+
 // Sign up user and store in Firestore
 export const signUpUser = async ({
   firstName,
@@ -95,7 +106,7 @@ export const getCurrentUserProfile = async () => {
 };
 
 // Update profile
-export const updateUserProfile = async (data: Partial<any>) => {
+export const updateUserProfile = async (data: Partial<UserProfile>) => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error("User not authenticated");

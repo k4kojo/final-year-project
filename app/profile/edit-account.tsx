@@ -116,7 +116,7 @@ export default function EditAccountScreen() {
         <Text style={styles.readOnlyLabel}>National ID</Text>
         <CustomInput
           value={form.nationalId}
-          onChangeText={(text) => handleChange("nationa id", text)}
+          onChangeText={(text) => handleChange("nationalId", text)}
         />
       </View>
 

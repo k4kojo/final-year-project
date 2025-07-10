@@ -22,16 +22,13 @@ export default function SettingsScreen() {
 
   const handleLogout = async () => {
     setLoggingOut(true);
-
-    setTimeout(async () => {
-      const res = await signOutUser();
-      setLoggingOut(false);
-      if (res.success) {
-        router.replace("/sign-in");
-      } else {
-        Alert.alert("Logout Failed", res.error);
-      }
-    }, 3000);
+    const res = await signOutUser();
+    setLoggingOut(false);
+    if (res.success) {
+      router.replace("/sign-in");
+    } else {
+      Alert.alert("Logout Failed", res.error);
+    }
   };
 
   const Item = ({
