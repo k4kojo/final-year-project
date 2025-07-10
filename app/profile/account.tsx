@@ -1,7 +1,8 @@
 import DataCard from "@/components/data-card.component";
+import { getCurrentUserProfile } from "@/firebase/authService";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "expo-router";
-import React from "react";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -10,33 +11,65 @@ import {
   View,
 } from "react-native";
 
-export default function AccountInformationScreen() {
-  const navigation = useNavigation();
+type UserProfile = {
+  nationalId: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  gender: string;
+  phoneNumber: string;
+  email: string;
+  city: string;
+  province: string;
+  address: string;
+};
 
-  // Dummy profile data (replace with context/Firebase later)
-  const profile = {
-    ecareId: "1092302",
-    username: "zhafira",
-    firstName: "Zhafira",
-    lastName: "Azalea",
-    dob: "Feb 12, 1994",
-    gender: "Female",
-    phone: "081892319321",
-    email: "zhafira@gmail.com",
-    city: "Bandung",
-    province: "West Java",
-    address: "Jl. Sekar Wangi 20 A, Bancangan",
-  };
+export default function AccountInformationScreen() {
+  const router = useRouter();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const userData = await getCurrentUserProfile();
+
+      if (userData) {
+        setProfile({
+          nationalId: userData.nationalId ?? "—",
+          username: userData.username ?? "—",
+          firstName: userData.firstName ?? "—",
+          lastName: userData.lastName ?? "—",
+          dateOfBirth: userData.dateOfBirth ?? "—",
+          gender: userData.gender ?? "—",
+          phoneNumber: userData.phoneNumber ?? "—",
+          email: userData.email ?? "—",
+          city: userData.city ?? "—",
+          province: userData.province ?? "—",
+          address: userData.address ?? "—",
+        });
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (!profile) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Loading profile...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => router.replace("/tabs/profile")}>
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Account Information</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/profile/edit-account")}>
           <Ionicons name="create-outline" size={22} color="#000" />
         </TouchableOpacity>
       </View>
@@ -45,11 +78,11 @@ export default function AccountInformationScreen() {
       <Text style={styles.sectionTitle}>Personal</Text>
       <DataCard
         data={[
-          { label: "Ecare ID", value: profile.ecareId },
+          { label: "National ID", value: profile.nationalId },
           { label: "Username", value: profile.username },
           { label: "First Name", value: profile.firstName },
           { label: "Last Name", value: profile.lastName },
-          { label: "Date of Birth", value: profile.dob },
+          { label: "Date of Birth", value: profile.dateOfBirth },
           { label: "Gender", value: profile.gender },
         ]}
       />
@@ -58,7 +91,7 @@ export default function AccountInformationScreen() {
       <Text style={styles.sectionTitle}>Contact</Text>
       <DataCard
         data={[
-          { label: "Phone Number", value: profile.phone },
+          { label: "Phone Number", value: profile.phoneNumber },
           { label: "Email", value: profile.email },
           { label: "City", value: profile.city },
           { label: "Province", value: profile.province },
@@ -75,6 +108,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 16,
     paddingTop: 60,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
   header: {
     flexDirection: "row",

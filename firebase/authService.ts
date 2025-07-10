@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, Timestamp, updateDoc } from "firebase/firestore";
 
 // Sign up user and store in Firestore
 export const signUpUser = async ({
@@ -92,4 +92,19 @@ export const getCurrentUserProfile = async () => {
   }
 
   return null;
+};
+
+// Update profile
+export const updateUserProfile = async (data: Partial<any>) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("User not authenticated");
+
+    const userRef = doc(db, "users", user.uid);
+    await updateDoc(userRef, data);
+
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 };
