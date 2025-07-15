@@ -1,5 +1,5 @@
 import Colors from "@/constants/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 
 import React from "react";
@@ -12,8 +12,8 @@ export default function TabsLayout() {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: "#828282",
         tabBarStyle: {
-          backgroundColor: "#eeeeee",
-          height: 100,
+          backgroundColor: "#fff",
+          height: 80,
           paddingBottom: 20,
           paddingTop: 10,
         },
@@ -24,7 +24,7 @@ export default function TabsLayout() {
         options={{
           title: "",
           tabBarIcon: ({ focused, color, size }) => (
-            <MaterialCommunityIcons
+            <Ionicons
               name={focused ? "home" : "home-outline"}
               size={30}
               color={color}
@@ -37,8 +37,8 @@ export default function TabsLayout() {
         options={{
           title: "",
           tabBarIcon: ({ focused, color, size }) => (
-            <MaterialCommunityIcons
-              name={focused ? "calendar-blank" : "calendar-blank-outline"}
+            <Ionicons
+              name={focused ? "calendar-clear" : "calendar-clear-outline"}
               size={30}
               color={color}
             />
@@ -50,9 +50,9 @@ export default function TabsLayout() {
         options={{
           title: "",
           tabBarIcon: ({ focused, color, size }) => (
-            <MaterialCommunityIcons
-              name={focused ? "video" : "video-outline"}
-              size={35}
+            <Ionicons
+              name={focused ? "videocam" : "videocam-outline"}
+              size={30}
               color={color}
             />
           ),
@@ -63,7 +63,7 @@ export default function TabsLayout() {
         options={{
           title: "",
           tabBarIcon: ({ focused, color, size }) => (
-            <MaterialCommunityIcons
+            <Ionicons
               name={focused ? "folder" : "folder-outline"}
               size={30}
               color={color}
@@ -76,8 +76,8 @@ export default function TabsLayout() {
         options={{
           title: "",
           tabBarIcon: ({ focused, color, size }) => (
-            <MaterialCommunityIcons
-              name={focused ? "account-circle" : "account-circle-outline"}
+            <Ionicons
+              name={focused ? "person-circle-sharp" : "person-circle-outline"}
               size={30}
               color={color}
             />

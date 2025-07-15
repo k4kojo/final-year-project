@@ -1,3 +1,5 @@
+import Colors from "@/constants/colors";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -13,7 +15,7 @@ type Props = {
   onCancel?: () => void;
 };
 
-const AppointmentCard = ({
+const DoctorCard = ({
   name,
   specialty,
   date,
@@ -45,13 +47,15 @@ const AppointmentCard = ({
           onPress={onEdit}
           style={[styles.button, styles.editButton]}
         >
-          <Text style={styles.buttonText}>Edit</Text>
+          <Ionicons name="videocam-outline" size={20} color={"#fff"} />
+          <Text style={styles.buttonText}>Join Call</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={onCancel}
           style={[styles.button, styles.cancelButton]}
         >
-          <Text style={styles.buttonText}>Cancel</Text>
+          <Ionicons name="chatbubble-outline" size={20} color={"#fff"} />
+          <Text style={styles.buttonText}>Message</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -96,21 +100,24 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   button: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 6,
   },
   editButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: Colors.primary,
   },
   cancelButton: {
-    backgroundColor: "#FF3B30",
+    backgroundColor: "black",
   },
   buttonText: {
     color: "#fff",
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: "500",
   },
 });
 
-export default AppointmentCard;
+export default DoctorCard;

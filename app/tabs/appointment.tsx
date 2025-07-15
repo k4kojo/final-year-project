@@ -1,5 +1,5 @@
-import AppointmentCard from "@/components/appointment-card.component";
 import Button from "@/components/button.component";
+import DoctorCard from "@/components/doctor-card";
 import TopHeader from "@/components/top-header.component";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -74,7 +74,7 @@ const Appointments = () => {
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.appointmentCardContainer}>
         {mockAppointments[selectedTab].map((appt) => (
-          <AppointmentCard
+          <DoctorCard
             key={appt.id}
             {...appt}
             onEdit={() => console.log("Editing", appt.id)}
@@ -84,8 +84,8 @@ const Appointments = () => {
 
         <View style={{ marginTop: 20 }}>
           <Button
-            title="Schedule appointment"
-            onPress={() => router.push("/tabs/appointment/schedule")}
+            title="Book appointment"
+            onPress={() => router.push("/appointment/schedule")}
           />
         </View>
       </ScrollView>

@@ -1,9 +1,11 @@
 import TopHeader from "@/components/top-header.component";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { useMemo, useState } from "react";
 import {
   FlatList,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -11,37 +13,43 @@ import {
 type RecordItem = {
   id: string;
   title: string;
-  date: string;
-  type: "lab" | "prescription" | "consultation";
+  date?: string;
+  type: "lab" | "prescription" | "consultation" | "header";
 };
 
 const labResults: RecordItem[] = [
+  { id: "lab-header", title: "Lab Results", type: "header" },
   { id: "1", title: "Blood Test", date: "May 20, 2024", type: "lab" },
   { id: "2", title: "X-Ray", date: "Feb 9, 2024", type: "lab" },
 ];
 
 const prescriptions: RecordItem[] = [
-  { id: "3", title: "Blood Test", date: "May 20, 2024", type: "prescription" },
-  { id: "4", title: "X-Ray", date: "Feb 9, 2024", type: "prescription" },
+  { id: "prescription-header", title: "Prescriptions", type: "header" },
+  { id: "3", title: "Amoxicillin", date: "Apr 10, 2024", type: "prescription" },
 ];
 
 const consultationNotes: RecordItem[] = [
-  { id: "5", title: "Blood Test", date: "May 20, 2024", type: "consultation" },
-  { id: "6", title: "X-Ray", date: "Feb 9, 2024", type: "consultation" },
+  { id: "consultation-header", title: "Consultation Notes", type: "header" },
+  {
+    id: "4",
+    title: "Follow-up Visit",
+    date: "May 20, 2024",
+    type: "consultation",
+  },
 ];
 
-const RecordCard = ({
-  item,
-  actionLabel,
-}: {
-  item: RecordItem;
-  actionLabel: string;
-}) => {
+const allRecords: RecordItem[] = [
+  ...labResults,
+  ...prescriptions,
+  ...consultationNotes,
+];
+
+const RecordCard = ({ item }: { item: RecordItem }) => {
   const icon =
     item.type === "consultation" ? (
       <Ionicons name="document-text-outline" size={24} color="#6366f1" />
     ) : (
-      <MaterialCommunityIcons name="flask-outline" size={24} color="#8b5cf6" />
+      <Ionicons name="flask-outline" size={24} color="#8b5cf6" />
     );
 
   return (
@@ -54,43 +62,58 @@ const RecordCard = ({
         </View>
       </View>
       <TouchableOpacity style={styles.actionButton}>
-        <Text style={styles.actionText}>{actionLabel}</Text>
+        <Text style={styles.actionText}>
+          {item.type === "consultation" ? "Download" : "View"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 };
+
 const Records = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredRecords = useMemo(() => {
+    if (!searchQuery.trim()) return allRecords;
+    return allRecords.filter(
+      (item) =>
+        item.type === "header" ||
+        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
+
+  const renderHeader = () => (
+    <View style={styles.searchRow}>
+      <TextInput
+        placeholder="Search records..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        style={styles.searchInput}
+      />
+      <TouchableOpacity style={styles.filterButton}>
+        <Ionicons name="filter-outline" size={20} color="#2563eb" />
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <TopHeader screen="records" />
-      <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Lab Results</Text>
-        <FlatList
-          data={labResults}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <RecordCard item={item} actionLabel="View" />
-          )}
-        />
-
-        <Text style={styles.sectionTitle}>Prescriptions</Text>
-        <FlatList
-          data={prescriptions}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <RecordCard item={item} actionLabel="View" />
-          )}
-        />
-
-        <Text style={styles.sectionTitle}>Consultation Notes</Text>
-        <FlatList
-          data={consultationNotes}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <RecordCard item={item} actionLabel="Download" />
-          )}
-        />
-      </View>
+      <FlatList
+        data={filteredRecords}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.content}
+        ListHeaderComponent={renderHeader}
+        renderItem={({ item }) =>
+          item.type === "header" ? (
+            <Text style={styles.sectionTitle}>{item.title}</Text>
+          ) : (
+            <RecordCard item={item} />
+          )
+        }
+        keyboardShouldPersistTaps="always" // ✅ Important!
+        removeClippedSubviews={false} // Optional: Prevents unmounting of off-screen items
+      />
     </View>
   );
 };
@@ -101,16 +124,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   content: {
-    flex: 1,
-    paddingTop: 30,
     paddingHorizontal: 20,
-    backgroundColor: "#fff",
+    paddingBottom: 40,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2563eb",
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
+    marginTop: 30,
+  },
+  searchInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginRight: 8,
+  },
+  filterButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
   },
   sectionTitle: {
     fontWeight: "600",

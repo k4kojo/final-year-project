@@ -1,14 +1,11 @@
-import Button from "@/components/button.component";
-import DatePickerField from "@/components/inputs/datePickerField.component";
+import StepHeader from "@/components/step-header-component";
 import Colors from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
-import { format } from "date-fns";
 import * as DocumentPicker from "expo-document-picker";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   FlatList,
-  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -16,29 +13,70 @@ import {
   View,
 } from "react-native";
 
-const doctors = [
-  { name: "Dr. Ama Mensah", specialty: "Cardiology" },
-  { name: "Dr. Kofi Asante", specialty: "Dermatology" },
-  { name: "Dr. Linda Owusu", specialty: "Pediatrics" },
-  { name: "Dr. Nana Yeboah", specialty: "General Practice" },
-  { name: "Dr. Afia Serwaa", specialty: "Cardiology" },
+// New Doctor List (replace the old one)
+export const doctors = [
+  {
+    initials: "DKA",
+    name: "Dr. Kwame Asante",
+    specialty: "General Practice",
+    clinic: "Accra Medical Center",
+    rating: 4.8,
+    reviews: 124,
+    fee: 150,
+    photo: "", // add URI later
+  },
+  {
+    initials: "DAO",
+    name: "Dr. Ama Osei",
+    specialty: "Cardiology",
+    clinic: "Heart Care Clinic",
+    rating: 4.9,
+    reviews: 89,
+    fee: 200,
+    photo: "",
+  },
+  {
+    initials: "DSA",
+    name: "Dr. Samuel Amoako",
+    specialty: "Cardiology",
+    clinic: "Inkoom Hospital",
+    rating: 4.9,
+    reviews: 89,
+    fee: 200,
+    photo: "../../assets/images/doctor1.jpg",
+    videoConsultation: true,
+  },
+  {
+    initials: "DHA",
+    name: "Dr. Henry Adgozo",
+    specialty: "Genral Physician",
+    clinic: "Korle-bu",
+    rating: 4.9,
+    reviews: 89,
+    fee: 200,
+    photo: "",
+  },
+  {
+    initials: "DSA",
+    name: "Dr. Sharon Antwi",
+    specialty: "Gynecology",
+    clinic: "Tema General Hospital",
+    rating: 4.9,
+    reviews: 89,
+    fee: 200,
+    photo: "",
+  },
 ];
 
 const ScheduleAppointment = () => {
-  type Doctor = { name: string; specialty: string };
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [selectedSpecialty, setSelectedSpecialty] = useState("");
-  const [isDoctorModalVisible, setDoctorModalVisible] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [consultationType, setConsultationType] = useState("Video");
-  const [reason, setReason] = useState("");
+  // type Doctor = { name: string; specialty: string };
+  // const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  // const [selectedSpecialty, setSelectedSpecialty] = useState("");
+  // const [isDoctorModalVisible, setDoctorModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [uploadedFile, setUploadFile] =
-    useState<DocumentPicker.DocumentPickerResult | null>(null);
+  useState<DocumentPicker.DocumentPickerResult | null>(null);
 
-  const times = ["09:00AM", "10:00AM", "11:00AM", "01:00PM"];
+  // const times = ["09:00AM", "10:00AM", "11:00AM", "01:00PM"];
 
   const filteredDoctors = doctors.filter(
     (doc) =>
@@ -46,194 +84,124 @@ const ScheduleAppointment = () => {
       doc.specialty.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleDoctorSelect = (doctor: { name: string; specialty: string }) => {
-    setSelectedDoctor(doctor);
-    setSelectedSpecialty(doctor.specialty);
-    setDoctorModalVisible(false);
-  };
-
-  const handleFileUpload = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "application/pdf",
-        copyToCacheDirectory: true,
-        multiple: false,
-      });
-
-      if (result.type === "success") {
-        setUploadFile(result); // OK here
-      } else {
-        setUploadFile(null); // Optional: clear previous upload if canceled
-      }
-    } catch (error) {
-      console.error("Error selecting file:", error);
-    }
-  };
+  // const handleDoctorSelect = (doctor: { name: string; specialty: string }) => {
+  //   setSelectedDoctor(doctor);
+  //   setSelectedSpecialty(doctor.specialty);
+  //   setDoctorModalVisible(false);
+  // };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.replace("/tabs/appointment")}>
           <Ionicons name="arrow-back" size={24} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Schedule Appointment</Text>
+        <Text style={styles.headerTitle}>Book Appointment</Text>
       </View>
 
-      {/* Doctor Picker */}
-      <Text style={styles.label}>Doctor</Text>
-      <TouchableOpacity
-        style={styles.pickerBox}
-        onPress={() => setDoctorModalVisible(true)}
-      >
-        <Text>{selectedDoctor?.name || "Select doctor"}</Text>
-      </TouchableOpacity>
+      {/* Step Header */}
+      <StepHeader step={1} />
 
-      {/* Modal */}
-      <Modal visible={isDoctorModalVisible} animationType="slide">
-        <View style={styles.modalContainer}>
-          {/* Close Icon */}
-          <TouchableOpacity
-            onPress={() => setDoctorModalVisible(false)}
-            style={[styles.closeIcon, { left: 20, right: "auto" }]}
-          >
-            <Ionicons name="close" size={24} color="#333" />
-          </TouchableOpacity>
+      <Text style={styles.sectionTitle}>Choose a Doctor</Text>
 
-          {/* Search Bar */}
-          <TextInput
-            placeholder="Search doctor or specialty"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            style={styles.searchInput}
-          />
-
-          {/* Doctor List */}
-          <FlatList
-            keyboardShouldPersistTaps="handled"
-            data={filteredDoctors}
-            keyExtractor={(item) => item.name}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => handleDoctorSelect(item)}
-                style={styles.doctorItem}
-              >
-                <Text style={styles.doctorName}>{item.name}</Text>
-                <Text style={styles.specialty}>{item.specialty}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </View>
-      </Modal>
-
-      {/* Specialty (auto-filled) */}
-      <Text style={styles.label}>Specialty</Text>
-      <View style={styles.pickerBox}>
-        <Text>{selectedSpecialty || ""}</Text>
-      </View>
-
-      {/* Date */}
-      <Text style={styles.label}>Date</Text>
-      <DatePickerField
-        show={showDatePicker}
-        date={date}
-        onToggle={() => setShowDatePicker(!showDatePicker)}
-        onChange={(event, selected) => {
-          if (selected) setDate(selected);
-        }}
-        onConfirm={() => setShowDatePicker(false)}
-        displayDate={format(date, "EEEE, MMMM d, yyyy")}
-        placeholder="Select appointment date"
-        inputStyles={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          borderRadius: 8,
-          padding: 12,
-          marginBottom: 10,
-          fontSize: 15,
-          color: "#333",
-        }}
-      />
-
-      {/* Time */}
-      <Text style={styles.label}>Time</Text>
-      <View style={styles.timeRow}>
-        {times.map((time) => (
-          <TouchableOpacity
-            key={time}
-            style={[
-              styles.timeButton,
-              selectedTime === time && styles.selectedTime,
-            ]}
-            onPress={() => setSelectedTime(time)}
-          >
-            <Text>{time}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Consultation Type */}
-      <Text style={styles.label}>Consultation Type</Text>
-      <View style={styles.radioRow}>
-        {["Video", "In-Person"].map((type) => (
-          <TouchableOpacity
-            key={type}
-            style={styles.radioOption}
-            onPress={() => setConsultationType(type)}
-          >
-            <Ionicons
-              name={
-                consultationType === type
-                  ? "radio-button-on"
-                  : "radio-button-off"
-              }
-              size={20}
-              color={Colors.primary}
-            />
-            <Text style={styles.radioLabel}>{type}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Reason */}
-      <Text style={styles.label}>Reason for Visit</Text>
-      <TextInput
-        placeholder="Enter a reason"
-        style={styles.input}
-        value={reason}
-        onChangeText={setReason}
-      />
-
-      {/* Upload Button */}
-      <Text style={styles.label}>Medical Documents</Text>
-      <View>
-        <TouchableOpacity
-          style={styles.uploadButton}
-          onPress={handleFileUpload}
-        >
-          <Ionicons name="cloud-upload-outline" size={18} />
-          <Text style={{ marginLeft: 5 }}>Upload</Text>
-        </TouchableOpacity>
-        {uploadedFile && (
-          <Text style={{ marginTop: 10, fontStyle: "italic" }}>
-            {uploadedFile.name} Remove
-          </Text>
-        )}
-      </View>
-
-      {/* Submit */}
-      <View style={{ marginTop: 20 }}>
-        <Button
-          title="Schedule appointment"
-          onPress={() => console.log("Scheduling...")}
+      {/* Search + Filter */}
+      <View style={styles.searchRow}>
+        <TextInput
+          placeholder="Search doctors..."
+          style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
         />
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => {
+            // Optional: Toggle specialty filter dropdown here
+          }}
+        >
+          <Ionicons name="filter-outline" size={20} color="#2563eb" />
+        </TouchableOpacity>
       </View>
+
+      {/* Doctor List */}
+      <FlatList
+        data={filteredDoctors}
+        keyExtractor={(item) => item.name}
+        contentContainerStyle={{ paddingBottom: 40 }}
+        renderItem={({ item }) => (
+          <View style={styles.doctorCard}>
+            <View style={styles.doctorCardLeft}>
+              <View
+                style={{
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                }}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <View style={styles.avatarPlaceholder} />
+                  <View>
+                    <Text style={styles.doctorName}>{item.name}</Text>
+                    <Text style={styles.subText}>{item.specialty}</Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        marginTop: 4,
+                      }}
+                    >
+                      <Ionicons name="star" color="orange" size={14} />
+                      <Text style={styles.ratingText}>
+                        {item.rating} ({item.reviews} reviews)
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: "row", gap: 2 }}>
+                      <Ionicons name="location-outline" size={14} />
+                      <Text style={styles.subText}>{item.clinic}</Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.consultationTypes}>
+                  <Text style={styles.consultationType}>Video</Text>
+                  <Text style={styles.consultationType}>In-Person</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.priceColumn}>
+              <Text style={styles.priceText}>₵{item.fee}</Text>
+              <Text style={styles.subText}>Consultation Fee</Text>
+              <TouchableOpacity
+                style={styles.selectBtn}
+                onPress={() => {
+                  // setSelectedDoctor(item);
+                  // setSelectedSpecialty(item.specialty);
+                  router.push({
+                    pathname: "/appointment/select-time",
+                    params: {
+                      name: item.name,
+                      specialty: item.specialty,
+                      clinic: item.clinic,
+                      fee: item.fee.toString(),
+                      rating: item.rating.toString(),
+                      reviews: item.reviews.toString(),
+                    },
+                  });
+                }}
+              >
+                <Text style={styles.selectBtnText}>Select Doctor</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingVertical: 80,
     paddingHorizontal: 20,
     backgroundColor: "#fff",
@@ -246,94 +214,102 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontWeight: "bold",
-    fontSize: 17,
+    fontSize: 18,
   },
-  label: {
-    fontWeight: "500",
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  pickerBox: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-  },
-  timeRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginBottom: 10,
-  },
-  timeButton: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 10,
-  },
-  selectedTime: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  radioRow: {
-    flexDirection: "row",
-    gap: 20,
-    marginBottom: 10,
-  },
-  radioOption: {
+  searchRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-  },
-  radioLabel: {
-    fontSize: 14,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-  },
-  modalContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  closeIcon: {
-    position: "absolute",
-    top: 40,
-    zIndex: 1,
+    marginBottom: 20,
   },
   searchInput: {
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 60,
-  },
-  doctorItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderColor: "#eee",
-  },
-  doctorName: {
-    fontWeight: "600",
-    fontSize: 16,
-  },
-  specialty: {
-    color: "gray",
-    fontSize: 13,
-  },
-  uploadButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
+    flex: 1,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
-    width: 120,
+    padding: 10,
+    marginRight: 8,
+  },
+  filterButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: "600",
+    marginBottom: 10,
+  },
+  doctorCard: {
+    backgroundColor: "#fff",
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  doctorCardLeft: {
+    flexDirection: "row",
+    gap: 12,
+    flex: 1,
+  },
+  avatarPlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#eee",
+    marginRight: 10,
+  },
+  doctorName: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  subText: {
+    color: "#555",
+    fontSize: 13,
+    marginTop: 2,
+  },
+  ratingText: {
+    fontSize: 13,
+    marginLeft: 6,
+  },
+  consultationTypes: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 6,
+  },
+  consultationType: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 20,
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+    fontSize: 12,
+    color: "#333",
+  },
+  priceColumn: {
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+  priceText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "green",
+  },
+  selectBtn: {
+    backgroundColor: Colors.primary,
+    marginTop: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 6,
+  },
+  selectBtnText: {
+    color: "#fff",
+    fontSize: 13,
   },
 });
 
