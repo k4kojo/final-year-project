@@ -69,26 +69,14 @@ export const doctors = [
 ];
 
 const ScheduleAppointment = () => {
-  // type Doctor = { name: string; specialty: string };
-  // const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  // const [selectedSpecialty, setSelectedSpecialty] = useState("");
-  // const [isDoctorModalVisible, setDoctorModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   useState<DocumentPicker.DocumentPickerResult | null>(null);
-
-  // const times = ["09:00AM", "10:00AM", "11:00AM", "01:00PM"];
 
   const filteredDoctors = doctors.filter(
     (doc) =>
       doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doc.specialty.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  // const handleDoctorSelect = (doctor: { name: string; specialty: string }) => {
-  //   setSelectedDoctor(doctor);
-  //   setSelectedSpecialty(doctor.specialty);
-  //   setDoctorModalVisible(false);
-  // };
 
   return (
     <View style={styles.container}>

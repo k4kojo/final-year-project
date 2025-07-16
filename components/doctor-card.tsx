@@ -11,8 +11,8 @@ type Props = {
   type: string;
   location: string;
   image: string;
-  onEdit?: () => void;
-  onCancel?: () => void;
+  onJoinCall?: () => void;
+  onChat?: () => void;
 };
 
 const DoctorCard = ({
@@ -23,8 +23,8 @@ const DoctorCard = ({
   type,
   location,
   image,
-  onEdit,
-  onCancel,
+  onJoinCall,
+  onChat,
 }: Props) => {
   return (
     <View style={styles.card}>
@@ -44,18 +44,18 @@ const DoctorCard = ({
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
         <TouchableOpacity
-          onPress={onEdit}
-          style={[styles.button, styles.editButton]}
+          onPress={onJoinCall}
+          style={[styles.button, styles.joinCallButton]}
         >
           <Ionicons name="videocam-outline" size={20} color={"#fff"} />
           <Text style={styles.buttonText}>Join Call</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={onCancel}
-          style={[styles.button, styles.cancelButton]}
+          onPress={onChat}
+          style={[styles.button, styles.chatButton]}
         >
           <Ionicons name="chatbubble-outline" size={20} color={"#fff"} />
-          <Text style={styles.buttonText}>Message</Text>
+          <Text style={styles.buttonText}>Chat</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -107,10 +107,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 6,
   },
-  editButton: {
-    backgroundColor: Colors.primary,
+  joinCallButton: {
+    backgroundColor: Colors.secondary,
   },
-  cancelButton: {
+  chatButton: {
     backgroundColor: "black",
   },
   buttonText: {

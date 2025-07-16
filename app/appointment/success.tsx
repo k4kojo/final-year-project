@@ -53,7 +53,7 @@ export default function SuccessScreen() {
       {/* Back to home */}
       <TouchableOpacity
         style={styles.homeBtn}
-        onPress={() => router.replace("/")}
+        onPress={() => router.replace("/tabs")}
       >
         <Text style={styles.homeBtnText}>Back to Home</Text>
       </TouchableOpacity>

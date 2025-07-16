@@ -31,7 +31,6 @@ const ConfirmScreen = () => {
       return;
     }
 
-    alert("Payment successful 🎉");
     router.replace("/appointment/success");
   };
 
