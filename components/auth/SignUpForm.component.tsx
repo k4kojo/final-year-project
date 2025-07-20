@@ -298,8 +298,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginVertical: 10,
   },
-  // link: {
-  //   color: "#2563EB",
-  //   fontWeight: "bold",
-  // },
 });

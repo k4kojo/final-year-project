@@ -7,14 +7,16 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
-  Text, // Make sure Text is imported
+  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import EmojiSelector from "react-native-emoji-selector";
+// Removed: import EmojiSelector from "react-native-emoji-selector";
 
 type Message = {
   id: string;
@@ -52,7 +54,7 @@ const ChatScreen = () => {
   ]);
 
   const [input, setInput] = useState("");
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  // Removed: const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -85,25 +87,16 @@ const ChatScreen = () => {
     }
 
     setInput("");
-    setShowEmojiPicker(false);
   };
 
-  const handleLongPress = (msg: {
-    id: any;
-    from: any;
-    text: any;
-    image?: string | undefined;
-    audio?: string | undefined;
-    timestamp?: string;
-    status?: "seen" | "delivered";
-  }) => {
+  const handleLongPress = (msg: Message) => {
     if (msg.from !== "user") return;
 
     Alert.alert("Message Options", "Choose an action", [
       {
         text: "Edit",
         onPress: () => {
-          setInput(msg.text);
+          setInput(msg.text || "");
           setEditingId(msg.id);
         },
       },
@@ -143,17 +136,19 @@ const ChatScreen = () => {
         await recording.stopAndUnloadAsync();
         const uri = recording.getURI();
         setRecording(null);
-        const newMessage: Message = {
-          id: Date.now().toString(),
-          from: "user",
-          audio: uri ?? undefined,
-          timestamp: new Date().toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          status: "delivered",
-        };
-        setMessages((prev) => [...prev, newMessage]);
+        if (uri) {
+          const newMessage: Message = {
+            id: Date.now().toString(),
+            from: "user",
+            audio: uri,
+            timestamp: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            status: "delivered",
+          };
+          setMessages((prev) => [...prev, newMessage]);
+        }
         return;
       }
       const { granted } = await Audio.requestPermissionsAsync();
@@ -181,106 +176,135 @@ const ChatScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push("/tabs/appointment")}>
-          {/* Corrected: Wrap Ionicons in Text */}
           <Text>
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </Text>
         </TouchableOpacity>
         <Image
-          source={{ uri: "https://randomuser.me/api/portraits/women/44.jpg" }}
+          source={require("@/assets/images/doctor_1.jpg")}
           style={styles.avatar}
         />
-        <Text style={styles.doctorName}>Dr. Jane Doe</Text>
-        <View style={{ flex: 1 }} />
-        <TouchableOpacity>
-          {/* Corrected: Wrap Ionicons in Text */}
-          <Text>
-            <Ionicons name="videocam" size={24} color="#fff" />
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Messages */}
-      <ScrollView ref={scrollRef} contentContainerStyle={styles.chatContainer}>
-        {messages.map((msg) => (
-          <TouchableOpacity
-            key={msg.id}
-            onLongPress={() => handleLongPress(msg)}
-            activeOpacity={0.8}
-            style={[
-              styles.messageBubble,
-              msg.from === "user" ? styles.userBubble : styles.doctorBubble,
-            ]}
-          >
-            {msg.text && (
-              <Text style={[styles.messageText, { color: "#fff" }]}>
-                {msg.text}
-              </Text>
-            )}
-            {msg.image && (
-              <Image
-                source={{ uri: msg.image }}
-                style={{ width: 200, height: 200, borderRadius: 10 }}
-              />
-            )}
-            {msg.audio && (
-              <Text style={{ color: "#fff", marginTop: 5 }}>
-                [Voice message]
-              </Text>
-            )}
-            <Text style={styles.timestamp}>
-              {msg.timestamp}{" "}
-              {msg.from === "user" && (msg.status === "seen" ? "✓✓" : "✓")}
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.doctorName}>Dr. Jane Doe</Text>
+          {isTyping && (
+            <Text
+              style={{ fontStyle: "italic", marginBottom: 5, color: "#fff" }}
+            >
+              Typing...
             </Text>
-          </TouchableOpacity>
-        ))}
-        {isTyping && (
-          <Text style={{ fontStyle: "italic", marginBottom: 5, color: "#555" }}>
-            Doctor is typing...
+          )}
+        </View>
+        <View style={{ flex: 1 }} />
+        <TouchableOpacity
+          onPress={() => router.push({ pathname: "/appointment/video-room" })}
+        >
+          <Text>
+            <Ionicons name="videocam-outline" size={24} color="#fff" />
           </Text>
-        )}
-      </ScrollView>
-
-      {/* Emoji Picker */}
-      {showEmojiPicker && (
-        <EmojiSelector
-          onEmojiSelected={(emoji) => setInput((prev) => prev + emoji)}
-          showSearchBar={false}
-          showTabs={true}
-          columns={8}
-          category={"all"}
-        />
-      )}
-
-      {/* Input */}
-      <View style={styles.inputContainer}>
-        <TouchableOpacity onPress={() => setShowEmojiPicker(!showEmojiPicker)}>
-          <Ionicons name="happy-outline" size={24} color="#555" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={pickImage}>
-          <Ionicons name="image-outline" size={24} color="#555" />
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          value={input}
-          placeholder="Type a message"
-          onChangeText={(text) => {
-            setInput(text);
-            setIsTyping(true);
-            setTimeout(() => setIsTyping(false), 1000);
-          }}
-        />
-        <TouchableOpacity onPress={handleRecord}>
-          <Ionicons
-            name={recording ? "stop-circle" : "mic-outline"}
-            size={24}
-            color={recording ? "red" : "#000"}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleSend}>
-          <Ionicons name="send" size={24} color="#000" />
         </TouchableOpacity>
       </View>
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      >
+        {/* Messages */}
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.chatContainer}
+        >
+          {messages.map((msg) => (
+            <TouchableOpacity
+              key={msg.id}
+              onLongPress={() => handleLongPress(msg)}
+              activeOpacity={0.8}
+              style={[
+                styles.messageBubble,
+                msg.from === "user" ? styles.userBubble : styles.doctorBubble,
+              ]}
+            >
+              {msg.text && (
+                <Text style={[styles.messageText, { color: "#fff" }]}>
+                  {msg.text}
+                </Text>
+              )}
+              {msg.image && (
+                <Image
+                  source={{ uri: msg.image }}
+                  style={{ width: 200, height: 200, borderRadius: 10 }}
+                />
+              )}
+              {msg.audio && (
+                <Text style={{ color: "#fff", marginTop: 5 }}>
+                  [Voice message]
+                </Text>
+              )}
+              <Text style={styles.timestamp}>
+                {msg.timestamp}{" "}
+                {msg.from === "user" &&
+                  (msg.status === "seen" ? (
+                    <Ionicons name="checkmark" size={15} color="#fff" />
+                  ) : (
+                    <Ionicons
+                      name="checkmark-done-outline"
+                      size={15}
+                      color="#fff"
+                    />
+                  ))}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Input */}
+        <View style={styles.inputContainer}>
+          {/* Replaced plus sign with a generic attachment icon or removed if not needed */}
+          {/* If you still want a general "plus" or "attachment" icon: */}
+          <TouchableOpacity onPress={() => console.log("Attachment options")}>
+            <Ionicons name="attach-outline" size={24} color="#555" />
+          </TouchableOpacity>
+          {/* Or if you want to remove it entirely and start with the input field:
+          <View /> // An empty view to maintain spacing if needed, or remove completely
+          */}
+
+          <TextInput
+            style={styles.input}
+            value={input}
+            placeholder="Type a message"
+            onChangeText={(text) => {
+              setInput(text);
+              setIsTyping(true);
+              setTimeout(() => setIsTyping(false), 1000);
+            }}
+          />
+
+          {/* Conditional rendering for camera/mic or send button */}
+          {input.length > 0 ? (
+            // Show send button if there's text in the input
+            <TouchableOpacity onPress={handleSend}>
+              <Ionicons name="send" size={24} color={Colors.primary} />
+            </TouchableOpacity>
+          ) : (
+            // Show camera and mic if no text
+            <>
+              <TouchableOpacity onPress={pickImage}>
+                <Ionicons name="camera-outline" size={24} color="#555" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleRecord}
+                style={{ marginLeft: 8 }}
+              >
+                <Ionicons
+                  name={recording ? "stop-circle" : "mic-outline"}
+                  size={24}
+                  color={recording ? "red" : "#555"}
+                />
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -324,17 +348,21 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   userBubble: {
-    backgroundColor: "#2276e3",
+    backgroundColor: Colors.primary,
     alignSelf: "flex-end",
+    borderBottomRightRadius: 0,
   },
   doctorBubble: {
     backgroundColor: "#444",
     alignSelf: "flex-start",
+    borderBottomLeftRadius: 0,
   },
   messageText: {
     fontSize: 14,
   },
   timestamp: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
     marginTop: 4,
     fontSize: 11,
     color: "#ddd",
@@ -344,7 +372,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 12,
-    paddingBottom: 28,
+    paddingBottom: Platform.OS === "ios" ? 28 : 12,
     backgroundColor: "#f1f1f1",
     borderTopWidth: 1,
     borderColor: "#ddd",

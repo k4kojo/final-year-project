@@ -4,18 +4,25 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
+  Dimensions, // Import Dimensions for dynamic styling
+  Platform,
   SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 
+// Get screen height for dynamic positioning
+const { height: screenHeight } = Dimensions.get("window");
+
 export default function VideoCallScreen() {
   const navigation = useNavigation();
   const route = useRoute();
+
+  // Assuming doctor info comes from route params or context
+  const doctorName = "Dr. Kwame Asante"; // Replace with actual prop/param
+  const doctorId = "doctor_kwame_asante_id"; // Replace with actual prop/param
 
   const localVideoRef = useRef<any>(null);
   const remoteVideoRef = useRef<any>(null);
@@ -26,7 +33,7 @@ export default function VideoCallScreen() {
   const [isConnecting, setIsConnecting] = useState(false);
 
   const [callDuration, setCallDuration] = useState(0);
-  const [showChat, setShowChat] = useState(false);
+  const [showChat, setShowChat] = useState(false); // This will control the visibility of the internal chat UI
   const [chatMessage, setChatMessage] = useState("");
   const [chatMessages, setChatMessages] = useState([
     {
@@ -38,6 +45,9 @@ export default function VideoCallScreen() {
   ]);
 
   const [notes, setNotes] = useState("");
+
+  // New state to manage the minimized video view
+  const [isVideoMinimized, setIsVideoMinimized] = useState(false);
 
   // Simulate call connection state and timer
   useEffect(() => {
@@ -53,6 +63,27 @@ export default function VideoCallScreen() {
 
     return () => clearInterval(timer);
   }, [isConnected]);
+
+  // Use a navigation listener to know when ChatScreen is focused/unfocused
+  useEffect(() => {
+    const unsubscribeFocus = navigation.addListener("focus", () => {
+      // When VideoCallScreen is focused, assume it's back from a pushed screen (like chat)
+      // and we might want to maximize it again, or keep it minimized if explicitly left so
+      // For this example, let's assume coming back means maximizing
+      setIsVideoMinimized(false);
+    });
+
+    // You might also want a blur listener if you need to specifically minimize when leaving this screen
+    // const unsubscribeBlur = navigation.addListener('blur', () => {
+    //   // If navigating away, you might want to minimize the video automatically
+    //   // setIsVideoMinimized(true);
+    // });
+
+    return () => {
+      unsubscribeFocus();
+      // unsubscribeBlur();
+    };
+  }, [navigation]);
 
   const formatDuration = (seconds: number) => {
     const min = Math.floor(seconds / 60);
@@ -76,40 +107,58 @@ export default function VideoCallScreen() {
   };
 
   const handleEndCall = () => {
-    router.back(); // Adjust to your route
+    // Navigate back to the previous screen (e.g., appointments list)
+    router.back();
+  };
+
+  const navigateToChatAndMinimizeVideo = () => {
+    setIsVideoMinimized(true); // Minimize current video view
+    router.push({
+      pathname: "./chat", // Use a relative path if chat-screen is a sibling route
+      params: { doctorId: doctorId, doctorName: doctorName }, // Pass data to ChatScreen
+    });
   };
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>DA</Text>
+      {!isVideoMinimized && ( // Hide header when minimized (optional)
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>DA</Text>
+            </View>
+            <View>
+              <Text style={styles.doctorName}>Dr. Kwame Asante</Text>
+              <Text style={styles.status}>{formatDuration(callDuration)}</Text>
+            </View>
           </View>
-          <View>
-            <Text style={styles.doctorName}>Dr. Kwame Asante</Text>
-            <Text style={styles.status}>{formatDuration(callDuration)}</Text>
-          </View>
-        </View>
 
-        <View style={styles.headerRight}>
-          <TouchableOpacity onPress={() => setShowChat(!showChat)}>
-            {showChat ? (
-              <Ionicons name="chatbubble" size={22} color="#fff" />
-            ) : (
+          <View style={styles.headerRight}>
+            <TouchableOpacity onPress={navigateToChatAndMinimizeVideo}>
+              {/* This icon will now trigger navigation to ChatScreen */}
               <Ionicons name="chatbubble-outline" size={22} color="#fff" />
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity style={{ marginLeft: 16 }} onPress={() => null}>
-            <Ionicons name="settings-outline" size={22} color="#fff" />
-          </TouchableOpacity>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ marginLeft: 16 }} onPress={() => null}>
+              <Ionicons name="settings-outline" size={22} color="#fff" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
 
-      {/* Video Section */}
-      <View style={styles.videoContainer}>
-        <View style={styles.remoteVideo}>
+      {/* Video Section - Conditionally render full or minimized */}
+      <View
+        style={
+          isVideoMinimized
+            ? styles.minimizedVideoContainer
+            : styles.videoContainer
+        }
+      >
+        <View
+          style={
+            isVideoMinimized ? styles.minimizedRemoteVideo : styles.remoteVideo
+          }
+        >
           {/* Replace with video SDK surface */}
           <View style={[styles.videoMock, { backgroundColor: "#111" }]}>
             {!isConnected ? (
@@ -123,7 +172,11 @@ export default function VideoCallScreen() {
         </View>
 
         {/* Local video (PiP) */}
-        <View style={styles.localVideo}>
+        <View
+          style={
+            isVideoMinimized ? styles.minimizedLocalVideo : styles.localVideo
+          }
+        >
           {isVideoEnabled ? (
             <View style={styles.videoMock}>
               <Text style={{ color: "#fff" }}>Self View</Text>
@@ -136,67 +189,41 @@ export default function VideoCallScreen() {
         </View>
       </View>
 
-      {/* Chat Section - Only when toggled */}
-      {showChat && (
-        <ScrollView style={styles.chatBox}>
-          {chatMessages.map((msg) => (
-            <View
-              key={msg.id}
-              style={[
-                styles.chatBubble,
-                msg.isDoctor ? styles.doctorBubble : styles.userBubble,
-              ]}
-            >
-              <Text style={styles.chatText}>{msg.sender}</Text>
-              <Text style={styles.chatText}>{msg.text}</Text>
-            </View>
-          ))}
-          {/* Input */}
-          <View style={styles.chatInputRow}>
-            <TextInput
-              value={chatMessage}
-              onChangeText={setChatMessage}
-              placeholder="Type a message"
-              placeholderTextColor="#ccc"
-              style={styles.chatInput}
-              onSubmitEditing={handleSendMessage}
-            />
-            <TouchableOpacity onPress={handleSendMessage}>
-              <Ionicons name="send" size={22} color="#10b981" />
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      )}
+      {/* Chat Section - Only when toggled (removed in favor of dedicated chat screen) */}
+      {/* This internal chat UI will no longer be used */}
+      {/* {showChat && ( ... )} */}
 
-      {/* Control Buttons */}
-      <View style={styles.controls}>
-        <TouchableOpacity
-          onPress={() => setIsAudioEnabled(!isAudioEnabled)}
-          style={styles.controlBtn}
-        >
-          <Ionicons
-            name={isAudioEnabled ? "mic" : "mic-off"}
-            size={22}
-            color="#fff"
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => setIsVideoEnabled(!isVideoEnabled)}
-          style={styles.controlBtn}
-        >
-          <Ionicons
-            name={isVideoEnabled ? "videocam" : "videocam-off"}
-            size={22}
-            color="#fff"
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleEndCall}
-          style={[styles.controlBtn, { backgroundColor: Colors.error }]}
-        >
-          <Ionicons name="call" size={22} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      {/* Control Buttons - Hide when video is minimized */}
+      {!isVideoMinimized && (
+        <View style={styles.controls}>
+          <TouchableOpacity
+            onPress={() => setIsAudioEnabled(!isAudioEnabled)}
+            style={styles.controlBtn}
+          >
+            <Ionicons
+              name={isAudioEnabled ? "mic" : "mic-off"}
+              size={22}
+              color="#fff"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setIsVideoEnabled(!isVideoEnabled)}
+            style={styles.controlBtn}
+          >
+            <Ionicons
+              name={isVideoEnabled ? "videocam" : "videocam-off"}
+              size={22}
+              color="#fff"
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleEndCall}
+            style={[styles.controlBtn, { backgroundColor: Colors.error }]}
+          >
+            <Ionicons name="call" size={22} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -204,9 +231,10 @@ export default function VideoCallScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1f2937", // gray-800
+    backgroundColor: "#1f2937",
   },
   header: {
+    paddingTop: 20,
     padding: 16,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -268,46 +296,33 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  chatBox: {
-    minHeight: 200,
-    maxHeight: 240,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    backgroundColor: Colors.accentDark,
+  minimizedVideoContainer: {
+    position: "absolute",
+    top: Platform.OS === "android" ? 30 : 50,
+    right: 10,
+    width: 180,
+    height: 135,
+    borderRadius: 10,
+    overflow: "hidden",
+    backgroundColor: "#000",
+    borderColor: Colors.accent,
+    borderWidth: 2,
+    zIndex: 100,
   },
-  chatBubble: {
-    maxWidth: "80%",
-    marginVertical: 4,
-    padding: 10,
-    borderRadius: 8,
-  },
-  doctorBubble: {
-    backgroundColor: "#374151",
-    alignSelf: "flex-start",
-  },
-  userBubble: {
-    backgroundColor: "#10b981",
-    alignSelf: "flex-end",
-  },
-  chatText: {
-    color: "#fff",
-    fontSize: 14,
-  },
-  chatInputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-    gap: 10,
-  },
-  chatInput: {
+  minimizedRemoteVideo: {
     flex: 1,
-    backgroundColor: "#1f2937",
-    borderColor: "#374151",
+    backgroundColor: "#000",
+  },
+  minimizedLocalVideo: {
+    position: "absolute",
+    right: 5,
+    bottom: 5,
+    width: 60,
+    height: 45,
+    backgroundColor: "#000",
+    borderColor: "#4b5563",
     borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    color: "#fff",
-    height: 40,
+    borderRadius: 5,
   },
   controls: {
     flexDirection: "row",
