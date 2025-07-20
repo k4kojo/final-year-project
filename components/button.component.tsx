@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   filledButton: {
-    backgroundColor: Color.primary,
+    backgroundColor: Color.brand.primary,
   },
   plainButton: {
     backgroundColor: "#fff",

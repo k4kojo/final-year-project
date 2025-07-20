@@ -1,12 +1,17 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
+
 const DataCard = ({
   data,
 }: {
   data: { label: string; value: string; fullWidth?: boolean }[];
 }) => {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: themeColors.subCard }]}>
       {data.map((item, index) => (
         <View
           key={index}
@@ -15,8 +20,12 @@ const DataCard = ({
             item.fullWidth ? styles.fullWidth : undefined,
           ]}
         >
-          <Text style={styles.dataLabel}>{item.label}</Text>
-          <Text style={styles.dataValue}>{item.value}</Text>
+          <Text style={[styles.dataLabel, { color: themeColors.subText }]}>
+            {item.label}
+          </Text>
+          <Text style={[styles.dataValue, { color: themeColors.text }]}>
+            {item.value}
+          </Text>
         </View>
       ))}
     </View>
@@ -25,7 +34,6 @@ const DataCard = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#f9fafb",
     borderRadius: 12,
     padding: 16,
     marginBottom: 30,
@@ -40,12 +48,12 @@ const styles = StyleSheet.create({
   },
   dataLabel: {
     fontSize: 12,
-    color: "#6b7280",
+    // color: "#6b7280",
     marginBottom: 4,
   },
   dataValue: {
     fontSize: 14,
-    color: "#111827",
+    // color: "#111827",
     fontWeight: "600",
   },
 });

@@ -1,4 +1,5 @@
 import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -26,33 +27,55 @@ const DoctorCard = ({
   onJoinCall,
   onChat,
 }: Props) => {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+  const brand = Colors.brand;
+
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: themeColors.card,
+          borderColor: themeColors.border,
+        },
+      ]}
+    >
       <View style={styles.cardHeader}>
         <Image source={{ uri: image }} style={styles.avatar} />
         <View>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.specialty}>{specialty}</Text>
+          <Text style={[styles.name, { color: themeColors.text }]}>{name}</Text>
+          <Text style={[styles.specialty, { color: themeColors.subText }]}>
+            {specialty}
+          </Text>
         </View>
       </View>
-      <Text style={styles.details}>
+
+      <Text style={[styles.details, { color: themeColors.subText }]}>
         {date} | {time}
       </Text>
-      <Text style={styles.details}>{type}</Text>
-      <Text style={styles.details}>{location}</Text>
+      <Text style={[styles.details, { color: themeColors.subText }]}>
+        {type}
+      </Text>
+      <Text style={[styles.details, { color: themeColors.subText }]}>
+        {location}
+      </Text>
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
         <TouchableOpacity
           onPress={onJoinCall}
-          style={[styles.button, styles.joinCallButton]}
+          style={[styles.button, { backgroundColor: brand.secondary }]}
         >
           <Ionicons name="videocam-outline" size={20} color={"#fff"} />
           <Text style={styles.buttonText}>Join Call</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={onChat}
-          style={[styles.button, styles.chatButton]}
+          style={[
+            styles.button,
+            { backgroundColor: theme === "dark" ? "#444" : "#000" },
+          ]}
         >
           <Ionicons name="chatbubble-outline" size={20} color={"#fff"} />
           <Text style={styles.buttonText}>Chat</Text>
@@ -62,10 +85,11 @@ const DoctorCard = ({
   );
 };
 
+export default DoctorCard;
+
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
@@ -86,7 +110,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   specialty: {
-    color: "gray",
     fontSize: 13,
   },
   details: {
@@ -107,17 +130,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 6,
   },
-  joinCallButton: {
-    backgroundColor: Colors.secondary,
-  },
-  chatButton: {
-    backgroundColor: "black",
-  },
   buttonText: {
     color: "#fff",
     fontSize: 15,
     fontWeight: "500",
   },
 });
-
-export default DoctorCard;

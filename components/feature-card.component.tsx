@@ -8,10 +8,12 @@ import {
   Text,
   View,
 } from "react-native";
+import Colors from "../constants/colors";
+import { useThemeContext } from "../context/ThemeContext";
 
 type Props = {
   title: string;
-  description: string;
+  description?: string;
   icon?: ImageSourcePropType;
   pressable?: boolean;
   onPress?: () => void;
@@ -24,6 +26,9 @@ const FeatureCard = ({
   pressable,
   onPress,
 }: Props) => {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+
   const scale = useState(new Animated.Value(1))[0];
 
   const animateIn = () => {
@@ -42,11 +47,20 @@ const FeatureCard = ({
   };
 
   const CardContent = (
-    <Animated.View style={[styles.card, { transform: [{ scale }] }]}>
+    <Animated.View
+      style={[
+        styles.card,
+        { backgroundColor: themeColors.card, transform: [{ scale }] },
+      ]}
+    >
       {icon && <Image source={icon} style={styles.icon} />}
-      <Text style={styles.cardTitle}>{title}</Text>
+      <Text style={[styles.cardTitle, { color: themeColors.text }]}>
+        {title}
+      </Text>
       {description ? (
-        <Text style={styles.cardDescription}>{description}</Text>
+        <Text style={[styles.cardDescription, { color: themeColors.subText }]}>
+          {description}
+        </Text>
       ) : null}
     </Animated.View>
   );

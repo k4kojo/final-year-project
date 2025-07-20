@@ -1,4 +1,5 @@
 import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import React, { RefObject } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import PhoneInput from "react-native-phone-number-input";
@@ -20,6 +21,9 @@ export default function PhoneInputField({
 }: Props) {
   const PhoneInputComponent = PhoneInput as any;
 
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+
   return (
     <View style={{ width: "100%" }}>
       <PhoneInputComponent
@@ -28,17 +32,30 @@ export default function PhoneInputField({
         defaultCode={defaultCode}
         layout="first"
         onChangeFormattedText={(text: string) => setValue(text)}
-        containerStyle={styles.container}
-        textContainerStyle={styles.textContainer}
-        codeTextStyle={styles.countryCodeText}
-        textInputStyle={styles.inputText}
+        containerStyle={[
+          styles.container,
+          { borderColor: error ? themeColors.error : themeColors.border },
+        ]}
+        textContainerStyle={[
+          styles.textContainer,
+          { backgroundColor: themeColors.card },
+        ]}
+        codeTextStyle={[styles.countryCodeText, { color: themeColors.text }]}
+        textInputStyle={[styles.inputText, { color: themeColors.text }]}
         textInputProps={{
           placeholder: "Phone number",
-          placeholderTextColor: Colors.placeholder,
+          placeholderTextColor: themeColors.placeholder,
         }}
-        flagButtonStyle={styles.flagButton}
+        flagButtonStyle={[
+          styles.flagButton,
+          { backgroundColor: themeColors.card },
+        ]}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && (
+        <Text style={[styles.errorText, { color: themeColors.error }]}>
+          {error}
+        </Text>
+      )}
     </View>
   );
 }
@@ -50,7 +67,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderWidth: 1,
     marginBottom: 12,
-    borderColor: "#ccc",
     borderRadius: 8,
     overflow: "hidden",
     backgroundColor: "transparent",
@@ -64,25 +80,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   flagButton: {
-    // backgroundColor: "#f3f4f6",
-    // borderTopLeftRadius: 8,
-    // borderBottomLeftRadius: 8,
-    // width: 85,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 8,
   },
   countryCodeText: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#111827",
   },
   inputText: {
     fontSize: 14,
-    color: "#111827",
     paddingLeft: 0,
   },
   errorText: {
-    color: "red",
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4,

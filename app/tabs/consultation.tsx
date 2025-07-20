@@ -1,4 +1,6 @@
 import TopHeader from "@/components/top-header.component";
+import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import {
   FlatList,
   Image,
@@ -34,49 +36,96 @@ const Consultation = () => {
       date: "May 20, 2024",
     },
   ];
+
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+  const brandColors = Colors.brand;
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       <TopHeader screen="consult" />
 
-      <View style={styles.content}>
+      <View
+        style={[styles.content, { backgroundColor: themeColors.background }]}
+      >
         {/* Upcoming Consultation */}
-        <Text style={styles.sectionTitle}>Upcoming Consultations</Text>
-        <View style={styles.card}>
+        <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+          Upcoming Consultations
+        </Text>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: themeColors.card,
+              borderColor: themeColors.border,
+            },
+          ]}
+        >
           <View style={styles.doctorRow}>
             <Image
               source={{ uri: upcomingConsultation.image }}
               style={styles.avatar}
             />
             <View style={{ flex: 1 }}>
-              <Text style={styles.doctorName}>
+              <Text style={[styles.doctorName, { color: themeColors.text }]}>
                 {upcomingConsultation.doctor}
               </Text>
-              <Text style={styles.specialty}>
+              <Text style={[styles.specialty, { color: themeColors.subText }]}>
                 {upcomingConsultation.specialty}
               </Text>
             </View>
           </View>
-          <Text style={styles.datetime}>
+
+          <Text style={[styles.datetime, { color: themeColors.subText }]}>
             {upcomingConsultation.date} | {upcomingConsultation.time}
           </Text>
-          <TouchableOpacity style={styles.joinButton}>
+          <TouchableOpacity
+            style={[
+              styles.joinButton,
+              { backgroundColor: brandColors.primary },
+            ]}
+          >
             <Text style={styles.joinButtonText}>Join Consultation</Text>
           </TouchableOpacity>
         </View>
 
         {/* Consultation History */}
-        <Text style={styles.sectionTitle}>Consultation History</Text>
+        <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+          Consultation History
+        </Text>
         <FlatList
           data={consultationHistory}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View style={styles.historyItem}>
+            <View
+              style={[
+                styles.historyItem,
+                {
+                  backgroundColor: themeColors.card,
+                  borderColor: themeColors.border,
+                },
+              ]}
+            >
               <View>
-                <Text style={styles.historyDoctor}>{item.doctor}</Text>
-                <Text style={styles.historyDate}>{item.date}</Text>
+                <Text
+                  style={[styles.historyDoctor, { color: themeColors.text }]}
+                >
+                  {item.doctor}
+                </Text>
+                <Text
+                  style={[styles.historyDate, { color: themeColors.subText }]}
+                >
+                  {item.date}
+                </Text>
               </View>
               <TouchableOpacity>
-                <Text style={styles.viewSummary}>View summary</Text>
+                <Text
+                  style={[styles.viewSummary, { color: brandColors.primary }]}
+                >
+                  View summary
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -86,16 +135,16 @@ const Consultation = () => {
   );
 };
 
+export default Consultation;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   content: {
     flex: 1,
     paddingTop: 30,
     paddingHorizontal: 20,
-    backgroundColor: "#fff",
   },
   sectionTitle: {
     fontSize: 18,
@@ -104,11 +153,9 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 10,
     padding: 15,
     marginBottom: 25,
-    backgroundColor: "#fff",
   },
   doctorRow: {
     flexDirection: "row",
@@ -128,15 +175,12 @@ const styles = StyleSheet.create({
   },
   specialty: {
     fontStyle: "italic",
-    color: "#666",
   },
   datetime: {
     marginTop: 5,
     marginBottom: 15,
-    color: "#444",
   },
   joinButton: {
-    backgroundColor: "#2563eb",
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: "center",
@@ -147,11 +191,9 @@ const styles = StyleSheet.create({
   },
   historyItem: {
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
-    backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -161,13 +203,9 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   historyDate: {
-    color: "#555",
     fontSize: 13,
   },
   viewSummary: {
-    color: "#2563eb",
     fontWeight: "500",
   },
 });
-
-export default Consultation;

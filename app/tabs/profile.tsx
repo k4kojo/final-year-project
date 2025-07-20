@@ -1,5 +1,6 @@
 import SettingItem from "@/components/settings-item";
 import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import { getCurrentUserProfile } from "@/firebase/authService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -21,6 +22,10 @@ export default function ProfileScreen() {
     email: string;
   } | null>(null);
 
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+  const brand = Colors.brand;
+
   useEffect(() => {
     const fetchProfile = async () => {
       const userData = await getCurrentUserProfile();
@@ -35,27 +40,26 @@ export default function ProfileScreen() {
     fetchProfile();
   }, []);
 
-  // const handleLogout = async () => {
-  //   const res = await signOutUser();
-  //   if (res.success) {
-  //     router.replace("/sign-in");
-  //   } else {
-  //     Alert.alert("Logout Failed", res.error);
-  //   }
-  // };
-
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       {/* Header */}
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>Profile</Text>
+        <Text style={[styles.header, { color: themeColors.text }]}>
+          Profile
+        </Text>
         <TouchableOpacity>
-          <Ionicons name="notifications-outline" size={26} color="#000" />
+          <Ionicons
+            name="notifications-outline"
+            size={26}
+            color={themeColors.text}
+          />
         </TouchableOpacity>
       </View>
 
       {/* Profile Card */}
-      <View style={styles.profileCard}>
+      <View style={[styles.profileCard, { backgroundColor: brand.primary }]}>
         <Image
           source={{
             uri: "https://randomuser.me/api/portraits/men/75.jpg",
@@ -71,13 +75,16 @@ export default function ProfileScreen() {
       </View>
 
       {/* Section */}
-      <Text style={styles.sectionTitle}>General</Text>
+      <Text style={[styles.sectionTitle, { color: themeColors.subText }]}>
+        General
+      </Text>
+
       <View style={styles.section}>
         <SettingItem
           icon="person"
           label="Account Information"
           caption="Change your account information"
-          color={Colors.primary}
+          color={brand.primary}
           onPress={() => router.push("/profile/account")}
         />
         <SettingItem
@@ -108,13 +115,6 @@ export default function ProfileScreen() {
           color="#191970"
           onPress={() => router.push("/profile/settings")}
         />
-        {/* <SettingItem
-          icon="log-out-outline"
-          label="Log Out"
-          caption=""
-          onPress={handleLogout}
-          color="#e11d48"
-        /> */}
       </View>
     </ScrollView>
   );
@@ -123,7 +123,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   headerContainer: {
     flexDirection: "row",
@@ -136,13 +135,11 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: "800",
-    color: "#000",
   },
   profileCard: {
     flexDirection: "row",
     justifyContent: "flex-start",
     gap: 10,
-    backgroundColor: "#2563eb",
     marginHorizontal: 20,
     borderRadius: 16,
     padding: 20,
@@ -176,7 +173,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 14,
     fontWeight: "500",
-    color: "#555",
   },
   section: {
     marginHorizontal: 10,

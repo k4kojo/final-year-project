@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import Button from "@/components/button.component";
 import FeatureCard from "@/components/feature-card.component";
 import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 
 export default function Index() {
   const calender = require("@/assets/images/calendar.png");
@@ -12,12 +13,24 @@ export default function Index() {
   const prescription = require("@/assets/images/medical.png");
   const shield = require("@/assets/images/shield.png");
 
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: themeColors.background },
+      ]}
+    >
       <View style={styles.content}>
         <View style={styles.welcomeSection}>
-          <Text style={styles.sectionTitle}>Welcome to Modern Healthcare</Text>
-          <Text style={styles.sectionDescription}>
+          <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+            Welcome to Modern Healthcare
+          </Text>
+          <Text
+            style={[styles.sectionDescription, { color: themeColors.subText }]}
+          >
             Connect with doctors, book appointments, and manage your health
             records from anywhere in Ghana and beyond.
           </Text>
@@ -46,8 +59,10 @@ export default function Index() {
           />
         </View>
 
-        <View style={styles.whyBox}>
-          <Text style={styles.sectionTitle}>Why Choose MediConnect?</Text>
+        <View style={[styles.whyBox, { backgroundColor: themeColors.subCard }]}>
+          <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+            Why Choose MediConnect?
+          </Text>
 
           <View style={styles.bullet}>
             <Image
@@ -55,8 +70,12 @@ export default function Index() {
               style={styles.bulletIcon}
             />
             <View>
-              <Text style={styles.bulletTitle}>Save Time</Text>
-              <Text style={styles.bulletSubtitle}>
+              <Text style={[styles.bulletTitle, { color: themeColors.text }]}>
+                Save Time
+              </Text>
+              <Text
+                style={[styles.bulletSubtitle, { color: themeColors.subText }]}
+              >
                 No more long queues and travel times
               </Text>
             </View>
@@ -65,8 +84,12 @@ export default function Index() {
           <View style={styles.bullet}>
             <Text style={styles.bulletIcon}>🧑‍⚕️</Text>
             <View>
-              <Text style={styles.bulletTitle}>Quality Care</Text>
-              <Text style={styles.bulletSubtitle}>
+              <Text style={[styles.bulletTitle, { color: themeColors.text }]}>
+                Quality Care
+              </Text>
+              <Text
+                style={[styles.bulletSubtitle, { color: themeColors.subText }]}
+              >
                 Connect with qualified doctors
               </Text>
             </View>
@@ -75,8 +98,12 @@ export default function Index() {
           <View style={styles.bullet}>
             <Text style={styles.bulletIcon}>🔐</Text>
             <View>
-              <Text style={styles.bulletTitle}>Privacy First</Text>
-              <Text style={styles.bulletSubtitle}>
+              <Text style={[styles.bulletTitle, { color: themeColors.text }]}>
+                Privacy First
+              </Text>
+              <Text
+                style={[styles.bulletSubtitle, { color: themeColors.subText }]}
+              >
                 Your health data is secure
               </Text>
             </View>
@@ -85,7 +112,7 @@ export default function Index() {
 
         <Button title="Get Started" onPress={() => router.push("/sign-up")} />
 
-        <Text style={styles.footer}>
+        <Text style={[styles.footer, { color: themeColors.text }]}>
           Already have an account?{" "}
           <Text
             onPress={() => {
@@ -132,7 +159,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   whyBox: {
-    backgroundColor: "#F9FAFB",
     padding: 15,
     borderRadius: 8,
     width: "100%",
@@ -165,7 +191,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   link: {
-    color: Colors.primary,
+    color: Colors.brand.primary,
     //fontWeight: "bold",
   },
 });

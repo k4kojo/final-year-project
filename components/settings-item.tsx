@@ -1,6 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import Colors from "../constants/colors";
+import { useThemeContext } from "../context/ThemeContext";
+
 const SettingItem = ({
   icon,
   label,
@@ -14,14 +17,29 @@ const SettingItem = ({
   onPress?: () => void;
   color?: string;
 }) => {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+
   return (
-    <TouchableOpacity onPress={onPress} style={styles.settingItem}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[
+        styles.settingItem,
+        { backgroundColor: themeColors.card, borderColor: themeColors.border },
+      ]}
+    >
       <View style={styles.iconWrapper}>
         <Ionicons name={icon} size={20} color={color} />
       </View>
       <View style={styles.textWrapper}>
-        <Text style={styles.itemLabel}>{label}</Text>
-        {!!caption && <Text style={styles.itemCaption}>{caption}</Text>}
+        <Text style={[styles.itemLabel, { color: themeColors.text }]}>
+          {label}
+        </Text>
+        {!!caption && (
+          <Text style={[styles.itemCaption, { color: themeColors.subText }]}>
+            {caption}
+          </Text>
+        )}
       </View>
       <Ionicons name="chevron-forward" size={18} color="#ccc" />
     </TouchableOpacity>
@@ -34,9 +52,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 16,
     paddingHorizontal: 10,
-    backgroundColor: "#fff",
     borderBottomWidth: 1,
-    borderColor: "#eee",
+    marginVertical: 8,
+    borderRadius: 8,
   },
   iconWrapper: {
     width: 36,

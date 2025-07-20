@@ -9,6 +9,9 @@ import {
   View,
 } from "react-native";
 
+import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
+
 type Props = {
   show: boolean;
   date: Date;
@@ -36,6 +39,10 @@ export default function DatePickerField({
   minimumDate,
   maximumDate,
 }: Props) {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+  const brand = Colors.brand;
+
   return (
     <View style={styles.container}>
       {show && (
@@ -48,30 +55,49 @@ export default function DatePickerField({
             style={{ height: 120 }}
             minimumDate={minimumDate}
             maximumDate={maximumDate}
+            textColor={themeColors.text} // Might only affect iOS
           />
           <View style={styles.buttonRow}>
             <TouchableOpacity onPress={onToggle}>
-              <Text style={styles.button}>Cancel</Text>
+              <Text style={[styles.button, { color: brand.primary }]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={onConfirm}>
-              <Text style={styles.button}>Confirm</Text>
+              <Text style={[styles.button, { color: brand.primary }]}>
+                Confirm
+              </Text>
             </TouchableOpacity>
           </View>
         </>
       )}
+
       {!show && (
         <Pressable onPress={onToggle}>
           <TextInput
-            style={[styles.input, inputStyles]}
+            style={[
+              styles.input,
+              {
+                borderColor: error ? themeColors.error : themeColors.border,
+                color: themeColors.text,
+                backgroundColor: themeColors.card,
+              },
+              inputStyles,
+            ]}
             value={displayDate || ""}
             placeholder={placeholder}
-            placeholderTextColor="#999"
+            placeholderTextColor={themeColors.placeholder}
             editable={false}
             onPressIn={onToggle}
           />
         </Pressable>
       )}
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+      {error ? (
+        <Text style={[styles.errorText, { color: themeColors.error }]}>
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -85,7 +111,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderRadius: 8,
-    borderColor: "#ccc",
     marginBottom: 12,
   },
   buttonRow: {
@@ -95,10 +120,9 @@ const styles = StyleSheet.create({
   },
   button: {
     fontSize: 16,
-    color: "#2563EB",
+    fontWeight: "500",
   },
   errorText: {
-    color: "red",
     fontSize: 12,
     marginBottom: 8,
     alignSelf: "flex-start",

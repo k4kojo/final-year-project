@@ -1,5 +1,6 @@
 import StepHeader from "@/components/step-header-component";
 import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { router } from "expo-router";
@@ -69,6 +70,9 @@ export const doctors = [
 ];
 
 const ScheduleAppointment = () => {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+
   const [searchQuery, setSearchQuery] = useState("");
   useState<DocumentPicker.DocumentPickerResult | null>(null);
 
@@ -79,25 +83,34 @@ const ScheduleAppointment = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace("/tabs/appointment")}>
-          <Ionicons name="arrow-back" size={24} />
+          <Ionicons name="arrow-back" size={24} color={themeColors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Book Appointment</Text>
+        <Text style={[styles.headerTitle, { color: themeColors.text }]}>
+          Book Appointment
+        </Text>
       </View>
 
       {/* Step Header */}
       <StepHeader step={1} />
 
-      <Text style={styles.sectionTitle}>Choose a Doctor</Text>
+      <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+        Choose a Doctor
+      </Text>
 
       {/* Search + Filter */}
       <View style={styles.searchRow}>
         <TextInput
           placeholder="Search doctors..."
-          style={styles.searchInput}
+          style={[
+            styles.searchInput,
+            { color: themeColors.text, borderColor: themeColors.border },
+          ]}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -107,7 +120,7 @@ const ScheduleAppointment = () => {
             // Optional: Toggle specialty filter dropdown here
           }}
         >
-          <Ionicons name="filter-outline" size={20} color="#2563eb" />
+          <Ionicons name="filter-outline" size={20} color={themeColors.text} />
         </TouchableOpacity>
       </View>
 
@@ -117,7 +130,9 @@ const ScheduleAppointment = () => {
         keyExtractor={(item) => item.name}
         contentContainerStyle={{ paddingBottom: 40 }}
         renderItem={({ item }) => (
-          <View style={styles.doctorCard}>
+          <View
+            style={[styles.doctorCard, { backgroundColor: themeColors.card }]}
+          >
             <View style={styles.doctorCardLeft}>
               <View
                 style={{
@@ -129,8 +144,16 @@ const ScheduleAppointment = () => {
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <View style={styles.avatarPlaceholder} />
                   <View>
-                    <Text style={styles.doctorName}>{item.name}</Text>
-                    <Text style={styles.subText}>{item.specialty}</Text>
+                    <Text
+                      style={[styles.doctorName, { color: themeColors.text }]}
+                    >
+                      {item.name}
+                    </Text>
+                    <Text
+                      style={[styles.subText, { color: themeColors.subText }]}
+                    >
+                      {item.specialty}
+                    </Text>
                     <View
                       style={{
                         flexDirection: "row",
@@ -139,26 +162,57 @@ const ScheduleAppointment = () => {
                       }}
                     >
                       <Ionicons name="star" color="orange" size={14} />
-                      <Text style={styles.ratingText}>
+                      <Text
+                        style={[
+                          styles.ratingText,
+                          { color: themeColors.subText },
+                        ]}
+                      >
                         {item.rating} ({item.reviews} reviews)
                       </Text>
                     </View>
                     <View style={{ flexDirection: "row", gap: 2 }}>
-                      <Ionicons name="location-outline" size={14} />
-                      <Text style={styles.subText}>{item.clinic}</Text>
+                      <Ionicons
+                        name="location-outline"
+                        size={14}
+                        color={themeColors.text}
+                      />
+                      <Text
+                        style={[styles.subText, { color: themeColors.subText }]}
+                      >
+                        {item.clinic}
+                      </Text>
                     </View>
                   </View>
                 </View>
                 <View style={styles.consultationTypes}>
-                  <Text style={styles.consultationType}>Video</Text>
-                  <Text style={styles.consultationType}>In-Person</Text>
+                  <Text
+                    style={[
+                      styles.consultationType,
+                      { color: themeColors.text },
+                    ]}
+                  >
+                    Video
+                  </Text>
+                  <Text
+                    style={[
+                      styles.consultationType,
+                      { color: themeColors.text },
+                    ]}
+                  >
+                    In-Person
+                  </Text>
                 </View>
               </View>
             </View>
 
             <View style={styles.priceColumn}>
-              <Text style={styles.priceText}>₵{item.fee}</Text>
-              <Text style={styles.subText}>Consultation Fee</Text>
+              <Text style={[styles.priceText, { color: "green" }]}>
+                ₵{item.fee}
+              </Text>
+              <Text style={[styles.subText, { color: themeColors.subText }]}>
+                Consultation Fee
+              </Text>
               <TouchableOpacity
                 style={styles.selectBtn}
                 onPress={() => {
@@ -192,7 +246,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 80,
     paddingHorizontal: 20,
-    backgroundColor: "#fff",
   },
   header: {
     flexDirection: "row",
@@ -212,7 +265,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 8,
     padding: 10,
     marginRight: 8,
@@ -227,7 +279,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   doctorCard: {
-    backgroundColor: "#fff",
     paddingVertical: 16,
     paddingHorizontal: 12,
     borderRadius: 12,
@@ -249,7 +300,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: "#eee",
     marginRight: 10,
   },
   doctorName: {
@@ -257,7 +307,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   subText: {
-    color: "#555",
     fontSize: 13,
     marginTop: 2,
   },
@@ -289,7 +338,7 @@ const styles = StyleSheet.create({
     color: "green",
   },
   selectBtn: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.brand.primary,
     marginTop: 8,
     paddingHorizontal: 14,
     paddingVertical: 8,

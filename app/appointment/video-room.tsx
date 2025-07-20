@@ -1,10 +1,11 @@
 import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  Dimensions, // Import Dimensions for dynamic styling
+  Dimensions,
   Platform,
   SafeAreaView,
   StyleSheet,
@@ -17,6 +18,9 @@ import {
 const { height: screenHeight } = Dimensions.get("window");
 
 export default function VideoCallScreen() {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+
   const navigation = useNavigation();
   const route = useRoute();
 
@@ -218,7 +222,7 @@ export default function VideoCallScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleEndCall}
-            style={[styles.controlBtn, { backgroundColor: Colors.error }]}
+            style={[styles.controlBtn, { backgroundColor: themeColors.error }]}
           >
             <Ionicons name="call" size={22} color="#fff" />
           </TouchableOpacity>
@@ -238,7 +242,7 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: Colors.accentDark,
+    backgroundColor: Colors.brand.accentDark,
     borderBottomWidth: 1,
     borderBottomColor: "#374151",
   },
@@ -251,7 +255,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: Colors.tertiary,
+    backgroundColor: Colors.brand.tertiary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -305,7 +309,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
     backgroundColor: "#000",
-    borderColor: Colors.accent,
+    borderColor: Colors.brand.accent,
     borderWidth: 2,
     zIndex: 100,
   },

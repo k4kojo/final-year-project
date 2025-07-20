@@ -2,6 +2,7 @@ import Button from "@/components/button.component";
 import DoctorCard from "@/components/doctor-card";
 import TopHeader from "@/components/top-header.component";
 import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -21,6 +22,10 @@ const Appointments = () => {
   );
   const [modalVisible, setModalVisible] = useState(false);
   const [activeAppointment, setActiveAppointment] = useState<any>(null);
+
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+  const brandColors = Colors.brand;
 
   const mockAppointments = {
     upcoming: [
@@ -70,21 +75,28 @@ const Appointments = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       <TopHeader screen="appointments" />
 
       {/* Tabs */}
-      <View style={styles.tabContainer}>
+      <View
+        style={[styles.tabContainer, { backgroundColor: themeColors.subCard }]}
+      >
         {["upcoming", "past"].map((tab) => (
           <Pressable
             key={tab}
-            style={[styles.tab, selectedTab === tab && styles.activeTab]}
+            style={[
+              styles.tab,
+              selectedTab === tab && { backgroundColor: brandColors.primary },
+            ]}
             onPress={() => setSelectedTab(tab as "upcoming" | "past")}
           >
             <Text
               style={[
                 styles.tabText,
-                selectedTab === tab && styles.activeTabText,
+                { color: selectedTab === tab ? "#fff" : themeColors.text },
               ]}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -93,7 +105,12 @@ const Appointments = () => {
         ))}
       </View>
 
-      <ScrollView contentContainerStyle={styles.appointmentCardContainer}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.appointmentCardContainer,
+          { backgroundColor: themeColors.background },
+        ]}
+      >
         {mockAppointments[selectedTab].map((appt) => (
           <DoctorCard
             key={appt.id}
@@ -114,7 +131,7 @@ const Appointments = () => {
       {/* Confirmation Modal */}
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
-          <View style={styles.modal}>
+          <View style={[styles.modal, { backgroundColor: themeColors.card }]}>
             <View style={styles.avatarCircle}>
               <Text style={styles.avatarText}>
                 {activeAppointment?.name
@@ -124,37 +141,54 @@ const Appointments = () => {
               </Text>
             </View>
 
-            <Text style={styles.modalDoctorName}>
+            <Text style={[styles.modalDoctorName, { color: themeColors.text }]}>
               {activeAppointment?.name}
             </Text>
             <View style={styles.modalRow}>
-              <Ionicons name="time-outline" size={18} />
-              <Text style={styles.modalText}>{activeAppointment?.time}</Text>
+              <Ionicons
+                name="time-outline"
+                size={18}
+                color={themeColors.subText}
+              />
+              <Text style={[styles.modalText, { color: themeColors.subText }]}>
+                {activeAppointment?.time}
+              </Text>
               <Ionicons
                 name="videocam-outline"
                 size={18}
+                color={themeColors.subText}
                 style={{ marginLeft: 8 }}
               />
-              <Text style={styles.modalText}>Video Call</Text>
+              <Text style={[styles.modalText, { color: themeColors.subText }]}>
+                Video Call
+              </Text>
             </View>
 
-            <Text style={styles.modalMessage}>
+            <Text style={[styles.modalMessage, { color: themeColors.text }]}>
               Ready to start your video consultation?
             </Text>
 
             <View style={styles.modalActions}>
               <TouchableOpacity
-                style={styles.startBtn}
+                style={[
+                  styles.startBtn,
+                  { backgroundColor: brandColors.secondary },
+                ]}
                 onPress={handleConfirmCall}
               >
                 <Ionicons name="videocam" size={18} color="#fff" />
                 <Text style={styles.startText}>Start</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.cancelBtn}
+                style={[
+                  styles.cancelBtn,
+                  { backgroundColor: themeColors.border },
+                ]}
                 onPress={() => setModalVisible(false)}
               >
-                <Text style={styles.cancelText}>Cancel</Text>
+                <Text style={[styles.cancelText, { color: themeColors.text }]}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -164,14 +198,14 @@ const Appointments = () => {
   );
 };
 
+export default Appointments;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   tabContainer: {
     flexDirection: "row",
-    backgroundColor: "#e0e0e0",
     marginTop: 20,
     marginHorizontal: 20,
     borderRadius: 20,
@@ -185,13 +219,6 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 14,
-    color: "#333",
-  },
-  activeTab: {
-    backgroundColor: Colors.primary,
-  },
-  activeTabText: {
-    color: "#fff",
     fontWeight: "600",
   },
   appointmentCardContainer: {
@@ -207,7 +234,6 @@ const styles = StyleSheet.create({
   },
   modal: {
     width: "85%",
-    backgroundColor: "#fff",
     paddingVertical: 30,
     paddingHorizontal: 20,
     borderRadius: 16,
@@ -241,12 +267,10 @@ const styles = StyleSheet.create({
   modalText: {
     marginLeft: 4,
     fontSize: 14,
-    color: "#4b5563",
   },
   modalMessage: {
     fontSize: 14,
     textAlign: "center",
-    color: "#374151",
     marginBottom: 22,
   },
   modalActions: {
@@ -256,7 +280,6 @@ const styles = StyleSheet.create({
   },
   startBtn: {
     flexDirection: "row",
-    backgroundColor: Colors.secondary,
     alignItems: "center",
     paddingVertical: 12,
     paddingHorizontal: 10,
@@ -272,7 +295,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   cancelBtn: {
-    backgroundColor: "#f3f4f6",
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -281,9 +303,6 @@ const styles = StyleSheet.create({
   cancelText: {
     textAlign: "center",
     fontSize: 14,
-    color: "#374151",
     fontWeight: "500",
   },
 });
-
-export default Appointments;

@@ -1,4 +1,6 @@
 import TopHeader from "@/components/top-header.component";
+import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import {
@@ -45,24 +47,45 @@ const allRecords: RecordItem[] = [
 ];
 
 const RecordCard = ({ item }: { item: RecordItem }) => {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+  const brand = Colors.brand;
+
   const icon =
     item.type === "consultation" ? (
-      <Ionicons name="document-text-outline" size={24} color="#6366f1" />
+      <Ionicons name="document-text-outline" size={24} color={brand.primary} />
     ) : (
-      <Ionicons name="flask-outline" size={24} color="#8b5cf6" />
+      <Ionicons name="flask-outline" size={24} color={brand.primary} />
     );
 
   return (
-    <View style={styles.card}>
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: themeColors.card,
+          borderColor: themeColors.border,
+        },
+      ]}
+    >
       <View style={styles.cardLeft}>
         {icon}
         <View style={{ marginLeft: 10 }}>
-          <Text style={styles.recordTitle}>{item.title}</Text>
-          <Text style={styles.recordDate}>{item.date}</Text>
+          <Text style={[styles.recordTitle, { color: themeColors.text }]}>
+            {item.title}
+          </Text>
+          <Text style={[styles.recordDate, { color: themeColors.subText }]}>
+            {item.date}
+          </Text>
         </View>
       </View>
-      <TouchableOpacity style={styles.actionButton}>
-        <Text style={styles.actionText}>
+      <TouchableOpacity
+        style={[
+          styles.actionButton,
+          { backgroundColor: themeColors.background },
+        ]}
+      >
+        <Text style={[styles.actionText, { color: brand.primary }]}>
           {item.type === "consultation" ? "Download" : "View"}
         </Text>
       </TouchableOpacity>
@@ -72,6 +95,9 @@ const RecordCard = ({ item }: { item: RecordItem }) => {
 
 const Records = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+  const brand = Colors.brand;
 
   const filteredRecords = useMemo(() => {
     if (!searchQuery.trim()) return allRecords;
@@ -86,18 +112,36 @@ const Records = () => {
     <View style={styles.searchRow}>
       <TextInput
         placeholder="Search records..."
+        placeholderTextColor={themeColors.placeholder}
         value={searchQuery}
         onChangeText={setSearchQuery}
-        style={styles.searchInput}
+        style={[
+          styles.searchInput,
+          {
+            backgroundColor: themeColors.card,
+            color: themeColors.text,
+            borderColor: themeColors.border,
+          },
+        ]}
       />
-      <TouchableOpacity style={styles.filterButton}>
-        <Ionicons name="filter-outline" size={20} color="#2563eb" />
+      <TouchableOpacity
+        style={[
+          styles.filterButton,
+          {
+            borderColor: themeColors.border,
+            backgroundColor: themeColors.card,
+          },
+        ]}
+      >
+        <Ionicons name="filter-outline" size={20} color={brand.primary} />
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       <TopHeader screen="records" />
       <FlatList
         data={filteredRecords}
@@ -106,22 +150,25 @@ const Records = () => {
         ListHeaderComponent={renderHeader}
         renderItem={({ item }) =>
           item.type === "header" ? (
-            <Text style={styles.sectionTitle}>{item.title}</Text>
+            <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+              {item.title}
+            </Text>
           ) : (
             <RecordCard item={item} />
           )
         }
-        keyboardShouldPersistTaps="always" // ✅ Important!
-        removeClippedSubviews={false} // Optional: Prevents unmounting of off-screen items
+        keyboardShouldPersistTaps="always"
+        removeClippedSubviews={false}
       />
     </View>
   );
 };
 
+export default Records;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
   },
   content: {
     paddingHorizontal: 20,
@@ -136,7 +183,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 8,
     padding: 10,
     marginRight: 8,
@@ -145,7 +191,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 8,
   },
   sectionTitle: {
@@ -158,12 +203,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
     alignItems: "center",
-    backgroundColor: "#fff",
   },
   cardLeft: {
     flexDirection: "row",
@@ -175,18 +218,13 @@ const styles = StyleSheet.create({
   },
   recordDate: {
     fontSize: 13,
-    color: "#555",
   },
   actionButton: {
-    backgroundColor: "#eff6ff",
     borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 12,
   },
   actionText: {
-    color: "#2563eb",
     fontWeight: "500",
   },
 });
-
-export default Records;

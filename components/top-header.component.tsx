@@ -1,5 +1,5 @@
 import Colors from "@/constants/colors";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -22,11 +22,7 @@ export default function TopHeader({
             <MaterialCommunityIcons name="menu" size={26} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity onPress={onRightPress}>
-            <MaterialCommunityIcons
-              name="bell-outline"
-              size={26}
-              color="#fff"
-            />
+            <Ionicons name="notifications-outline" size={26} color="#fff" />
           </TouchableOpacity>
         </>
       ) : (
@@ -48,7 +44,7 @@ const styles = StyleSheet.create({
     height: "18%",
     paddingHorizontal: 20,
     paddingTop: 50,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.brand.primary,
   },
   homeTitle: {
     fontSize: 20,

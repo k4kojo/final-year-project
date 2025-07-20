@@ -1,4 +1,6 @@
 import DataCard from "@/components/data-card.component";
+import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import { getCurrentUserProfile } from "@/firebase/authService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -28,6 +30,9 @@ type UserProfile = {
 export default function AccountInformationScreen() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -62,20 +67,24 @@ export default function AccountInformationScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace("/tabs/profile")}>
-          <Ionicons name="arrow-back" size={24} color="#000" />
+          <Ionicons name="arrow-back" size={24} color={themeColors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Account Information</Text>
         <TouchableOpacity onPress={() => router.push("/profile/edit-account")}>
-          <Ionicons name="create-outline" size={22} color="#000" />
+          <Ionicons name="create-outline" size={22} color={themeColors.text} />
         </TouchableOpacity>
       </View>
 
       {/* Personal Info */}
-      <Text style={styles.sectionTitle}>Personal</Text>
+      <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+        Personal
+      </Text>
       <DataCard
         data={[
           { label: "National ID", value: profile.nationalId },
@@ -88,7 +97,9 @@ export default function AccountInformationScreen() {
       />
 
       {/* Contact Info */}
-      <Text style={styles.sectionTitle}>Contact</Text>
+      <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+        Contact
+      </Text>
       <DataCard
         data={[
           { label: "Phone Number", value: profile.phoneNumber },

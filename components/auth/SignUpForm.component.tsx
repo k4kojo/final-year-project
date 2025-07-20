@@ -17,25 +17,23 @@ import DatePickerField from "../inputs/datePickerField.component";
 import PhoneInputField from "../inputs/phoneInputField.component";
 import TextInputField from "../inputs/textInputField.component";
 
+import { useThemeContext } from "@/context/ThemeContext";
 import { signUpUser } from "@/firebase/authService";
 import { validateAuth } from "@/firebase/validateAuth";
 
 const SignUpForm = () => {
-  // OAuth logo assets
   const appleLogo = require("@/assets/images/apple_logo.png");
   const googleLogo = require("@/assets/images/google_logo.png");
 
-  // Navigation
   const router = useRouter();
-
-  // Phone input ref and country code
-  const PhoneInput = useRef<PhoneInput>(null);
+  const PhoneInputRef = useRef<PhoneInput>(null);
   const countryCode = Localization.getLocales()[0]?.regionCode ?? "GH";
 
-  // Agreement checkbox states
-  const [agree, setAgree] = useState(false);
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+  const brandColors = Colors.brand;
 
-  // Form field states
+  const [agree, setAgree] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -46,7 +44,6 @@ const SignUpForm = () => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Error messages for form fields
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -57,10 +54,8 @@ const SignUpForm = () => {
     confirmPassword: "",
   });
 
-  // Toggle date picker visibility
   const toggleDatePicker = () => setShowDatePicker(!showDatePicker);
 
-  // Handle data selection
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (event.type === "set") {
       setDate(selectedDate || new Date());
@@ -69,13 +64,11 @@ const SignUpForm = () => {
     }
   };
 
-  // Confirm and display selected date
   const confirmDate = () => {
     setDateOfBirth(date.toLocaleDateString());
     toggleDatePicker();
   };
 
-  // Form submission with validation
   const handleSubmit = async () => {
     const rawErrors = validateAuth(
       {
@@ -90,7 +83,6 @@ const SignUpForm = () => {
       "signup"
     );
 
-    // Ensure all error fields are strings
     const newErrors = {
       firstName: rawErrors.firstName ?? "",
       lastName: rawErrors.lastName ?? "",
@@ -116,7 +108,7 @@ const SignUpForm = () => {
     });
 
     if (!result.success) {
-      alert("Sigh up failed: " + result.error);
+      alert("Sign up failed: " + result.error);
       return;
     }
 
@@ -124,10 +116,18 @@ const SignUpForm = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <Text style={styles.subtitle}>Fill out the form to get started</Text>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { backgroundColor: themeColors.background },
+      ]}
+    >
+      <Text style={[styles.title, { color: themeColors.text }]}>Sign Up</Text>
+      <Text style={[styles.subtitle, { color: themeColors.subText }]}>
+        Fill out the form to get started
+      </Text>
 
+      {/* Fields */}
       <TextInputField
         placeholder="First name"
         value={firstName}
@@ -166,7 +166,7 @@ const SignUpForm = () => {
       />
 
       <PhoneInputField
-        phoneInputRef={PhoneInput}
+        phoneInputRef={PhoneInputRef}
         value={phoneNumber}
         setValue={setPhoneNumber}
         defaultCode={countryCode}
@@ -178,7 +178,9 @@ const SignUpForm = () => {
         value={password}
         onChangeText={(text) => {
           setPassword(text);
-          if (errors.password) setErrors({ ...errors, password: "" });
+          if (errors.password) {
+            setErrors({ ...errors, password: "" });
+          }
         }}
         secureTextEntry
         error={errors.password}
@@ -189,23 +191,41 @@ const SignUpForm = () => {
         value={confirmPassword}
         onChangeText={(text) => {
           setConfirmPassword(text);
-          if (errors.confirmPassword)
+          if (errors.confirmPassword) {
             setErrors({ ...errors, confirmPassword: "" });
+          }
         }}
         secureTextEntry
         error={errors.confirmPassword}
       />
 
+      {/* Agreement Checkbox */}
       <View style={styles.checkboxRow}>
         <TouchableOpacity
-          style={[styles.checkbox]}
+          style={[
+            styles.checkbox,
+            {
+              backgroundColor: agree ? brandColors.primary : "transparent",
+              borderColor: themeColors.border,
+            },
+          ]}
           onPress={() => setAgree(!agree)}
         >
-          {agree && <Text style={styles.checkmark}>✔</Text>}
+          {agree && (
+            <Text style={[styles.checkmark, { color: themeColors.text }]}>
+              ✔
+            </Text>
+          )}
         </TouchableOpacity>
-        <Text style={styles.checkboxText}>
-          I agree to the <Text style={styles.link}>Terms of Service</Text> and{" "}
-          <Text style={styles.link}>Privacy Policy</Text>
+        <Text style={[styles.checkboxText, { color: themeColors.text }]}>
+          I agree to the{" "}
+          <Text style={[styles.link, { color: brandColors.primary }]}>
+            Terms of Service
+          </Text>{" "}
+          and{" "}
+          <Text style={[styles.link, { color: brandColors.primary }]}>
+            Privacy Policy
+          </Text>
         </Text>
       </View>
 
@@ -213,7 +233,7 @@ const SignUpForm = () => {
 
       <Divider />
 
-      {/* OAuth buttons */}
+      {/* OAuth */}
       <Button
         icon={googleLogo}
         title=" Sign up with Google"
@@ -229,9 +249,12 @@ const SignUpForm = () => {
         plain
       />
 
-      <Text style={styles.footerText}>
+      <Text style={[styles.footerText, { color: themeColors.text }]}>
         Already have an account?{" "}
-        <Text style={styles.link} onPress={() => router.replace("/sign-in")}>
+        <Text
+          style={[styles.link, { color: brandColors.primary }]}
+          onPress={() => router.replace("/sign-in")}
+        >
           Sign in
         </Text>
       </Text>
@@ -243,7 +266,6 @@ export default SignUpForm;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 20,
@@ -254,7 +276,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    color: Colors.subtitle,
     fontSize: 16,
     marginBottom: 20,
   },
@@ -267,7 +288,6 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 1,
-    borderColor: "#ccc",
     marginRight: 10,
     justifyContent: "center",
     alignItems: "center",
@@ -278,21 +298,18 @@ const styles = StyleSheet.create({
   },
   checkboxText: {
     fontSize: 13,
-    color: "#333",
     flex: 1,
     flexWrap: "wrap",
   },
   link: {
-    color: Colors.primary,
-    //fontWeight: "bold",
+    fontWeight: "600",
   },
   oauthButton: {
     padding: 12,
     borderRadius: 8,
-    borderColor: "#ccc",
     borderWidth: 1,
     marginBottom: 10,
-    alignItems: "center",
+    width: "100%",
   },
   footerText: {
     fontSize: 15,

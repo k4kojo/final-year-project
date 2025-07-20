@@ -1,3 +1,5 @@
+import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import {
   getCurrentUserProfile,
   updateUserProfile,
@@ -20,6 +22,9 @@ import {
 export default function EditAccountScreen() {
   const router = useRouter();
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
 
   const [form, setForm] = useState({
     nationalId: "",
@@ -99,7 +104,9 @@ export default function EditAccountScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
@@ -275,7 +282,6 @@ const GenderOption = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     paddingBottom: 30,
     padding: 20,
   },

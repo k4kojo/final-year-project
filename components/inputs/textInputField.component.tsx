@@ -1,4 +1,5 @@
 import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -27,6 +28,9 @@ export default function TextInputField({
 }: Props) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+
   const togglePasswordVisibility = () => {
     setIsPasswordVisible((prev) => !prev);
   };
@@ -44,8 +48,16 @@ export default function TextInputField({
       <View style={styles.inputWrapper}>
         <TextInput
           placeholder={placeholder}
-          placeholderTextColor={Colors.placeholder}
-          style={[styles.input, showToggle && { paddingRight: 40 }]}
+          placeholderTextColor={themeColors.placeholder}
+          style={[
+            styles.input,
+            {
+              borderColor: error ? themeColors.error : themeColors.border,
+              color: themeColors.text,
+              backgroundColor: themeColors.card,
+            },
+            showToggle && { paddingRight: 40 },
+          ]}
           value={value}
           keyboardType={getKeyboardType()}
           autoCapitalize="none"
@@ -60,7 +72,7 @@ export default function TextInputField({
             <MaterialIcons
               name={isPasswordVisible ? "visibility-off" : "visibility"}
               size={22}
-              color={Colors.placeholder}
+              color={themeColors.placeholder}
             />
           </TouchableOpacity>
         )}
@@ -83,7 +95,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderRadius: 8,
-    borderColor: "#ccc",
   },
   icon: {
     position: "absolute",
@@ -91,7 +102,7 @@ const styles = StyleSheet.create({
     top: 14,
   },
   errorText: {
-    color: Colors.error,
+    color: Colors.light.error,
     fontSize: 12,
     marginTop: 4,
     alignSelf: "flex-start",
