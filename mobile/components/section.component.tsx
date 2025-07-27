@@ -26,7 +26,7 @@ const Section = ({
       <View style={styles.header}>
         <Text style={[styles.title, { color: themeColors.text }]}>{title}</Text>
         {viewAll && (
-          <TouchableOpacity onPress={() => router.push(destination)}>
+          <TouchableOpacity onPress={() => router.push(destination as any)}>
             <Text style={[styles.viewAll, { color: brandColors.primary }]}>
               View All
             </Text>
