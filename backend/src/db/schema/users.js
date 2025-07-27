@@ -1,6 +1,5 @@
 import {
   boolean,
-  integer,
   pgTable,
   serial,
   text,
@@ -18,7 +17,7 @@ export const users = pgTable("users", {
 
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
-  phoneNumber: integer("phone_number").notNull(),
+  phoneNumber: varchar("phone_number").notNull(),
 
   profilePicture: varchar("profile_picture").default(null),
 

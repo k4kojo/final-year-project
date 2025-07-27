@@ -17,8 +17,8 @@ const userRoutes = Router();
 userRoutes.post("/", createUser);
 userRoutes.get("/", authenticateToken, authorizeRoles("admin"), getAllUsers); // Only admin can access
 userRoutes.get("/:id", authenticateToken, getUserById); // Any authenticated user can access
-userRoutes.put("/:id/update", authenticateToken, updateUserById);
-userRoutes.delete("/:id/delete", authenticateToken, deleteUserById);
+userRoutes.put("/:id", updateUserById);
+userRoutes.delete("/:id", deleteUserById);
 userRoutes.post("/login", loginUser);
 userRoutes.get("/verify-email", verifyEmail);
 userRoutes.post("/:id/request-password-reset", requestPasswordReset);
