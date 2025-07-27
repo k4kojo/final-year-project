@@ -58,7 +58,8 @@
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^3.1.0"
+    "redux-thunk": "^3.1.0",
+    "expo-camera": "~16.1.11"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -69,5 +70,18 @@
     "eslint-config-expo": "~9.2.0",
     "typescript": "~5.8.3"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "name": "MediConnect",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow MediConnect to access your camera",
+          "microphonePermission": "Allow MediConnect to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
+    ]
+  }
 }

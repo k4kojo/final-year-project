@@ -1,41 +1,42 @@
 const Colors = {
   light: {
-    background: "#FFFFFF",
-    card: "#FFFFFF",
-    subCard: "#F9FAFB",
-    text: "#111827",
-    subText: "#6B7280",
-    border: "#E5E7EB",
-    divider: "#E0E0E0",
-    success: "#22C55E",
-    warning: "#F59E0B",
-    error: "#EF4444",
-    inactive: "#9CA3AF",
+    avatar: "#E0F2FE",
+    background: "#F9FAFB", // Softer white
+    card: "#FFFFFF", // White card
+    subCard: "#F3F4F6", // Very light grey
+    text: "#111827", // Almost black (same)
+    subText: "#4B5563", // Darker than before for better readability
+    border: "#E5E7EB", // Light gray border
+    divider: "#D1D5DB", // Improved divider contrast
+    success: "#16A34A", // Rich green
+    warning: "#D97706", // Strong amber
+    error: "#DC2626", // Rich red
+    inactive: "#9CA3AF", // Light gray
     placeholder: "#9CA3AF",
-    icon: "#374151",
+    icon: "#374151", // Icon remains dark for contrast
   },
   dark: {
-    background: "#000000",
-    card: "#1F2937",
-    subCard: "#1F2937",
-    text: "#FFFFFF",
-    subText: "#D1D5DB",
-    border: "#333333",
-    divider: "#444444",
-    success: "#22C55E",
-    warning: "#FBBF24",
-    error: "#EF4444",
-    inactive: "#6B7280",
-    placeholder: "#9CA3AF",
-    icon: "#E5E7EB",
+    avatar: "#1E3A8A",
+    background: "#0F172A", // Deep blue-gray
+    card: "#1E293B", // Dark slate blue
+    subCard: "#334155", // Slightly lighter
+    text: "#F8FAFC", // Off-white for comfort
+    subText: "#94A3B8", // Muted blue-gray
+    border: "#475569", // Subtle gray
+    divider: "#334155", // Same as subCard for visual harmony
+    success: "#22C55E", // Bright green
+    warning: "#FACC15", // Yellow tone
+    error: "#F87171", // Softer red for dark mode
+    inactive: "#64748B", // Muted blue-gray
+    placeholder: "#94A3B8", // Similar to subText
+    icon: "#CBD5E1", // Light muted gray
   },
-  // Brand Colors
   brand: {
-    primary: "#2563EB",
-    secondary: "#4169E1",
-    tertiary: "#6495ED",
-    accent: "#004687",
-    accentDark: "#111827",
+    primary: "#2563EB", // Blue (unchanged)
+    secondary: "#3B82F6", // More modern than RoyalBlue
+    tertiary: "#60A5FA", // Sky blue
+    accent: "#1D4ED8", // Stronger blue
+    accentDark: "#0F172A", // Matches dark bg for subtlety
   },
 };
 

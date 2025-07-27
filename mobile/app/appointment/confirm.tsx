@@ -1,4 +1,3 @@
-import StepHeader from "@/components/step-header-component";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -11,7 +10,14 @@ import {
   View,
 } from "react-native";
 
+import StepHeader from "@/components/step-header-component";
+import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
+
 const ConfirmScreen = () => {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+
   const router = useRouter();
   const [reason, setReason] = useState("");
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -35,46 +41,72 @@ const ConfirmScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={22} color="#000" />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          marginBottom: 20,
+        }}
+        onPress={() => router.back()}
+      >
+        <Ionicons name="chevron-back" size={22} color={themeColors.text} />
+        <Text style={{ fontSize: 18, color: themeColors.text }}>Back</Text>
+      </TouchableOpacity>
 
       <StepHeader step={3} />
 
       {/* Row layout */}
       <View style={styles.rowWrap}>
         {/* Appointment Details */}
-        <View style={styles.card}>
-          <Text style={styles.cardHeading}>Appointment Details</Text>
+        <View style={[styles.card, { backgroundColor: themeColors.subCard }]}>
+          <Text style={[styles.cardHeading, { color: themeColors.text }]}>
+            Appointment Details
+          </Text>
           <View style={styles.docRow}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
+            <View
+              style={[styles.avatar, { backgroundColor: themeColors.avatar }]}
+            >
+              <Text style={[styles.avatarText, { color: themeColors.text }]}>
                 {initials?.toString() ?? "Dr"}
               </Text>
             </View>
             <View>
-              <Text style={styles.docName}>{name ?? "Doctor Name"}</Text>
-              <Text style={styles.grayText}>{specialty ?? "Specialty"}</Text>
+              <Text style={[styles.docName, { color: themeColors.text }]}>
+                {name ?? "Doctor Name"}
+              </Text>
+              <Text style={[styles.grayText, { color: themeColors.subText }]}>
+                {specialty ?? "Specialty"}
+              </Text>
             </View>
           </View>
 
           <View style={styles.iconRow}>
-            <Ionicons name="calendar-outline" size={16} />
-            <Text style={styles.rowText}>
+            <Ionicons
+              name="calendar-outline"
+              size={16}
+              color={themeColors.text}
+            />
+            <Text style={[styles.rowText, { color: themeColors.subText }]}>
               {date ? new Date(date.toString()).toDateString() : "Date"}
             </Text>
           </View>
           <View style={styles.iconRow}>
-            <Ionicons name="time-outline" size={16} />
-            <Text style={styles.rowText}>{time ?? "Time"}</Text>
+            <Ionicons name="time-outline" size={16} color={themeColors.text} />
+            <Text style={[styles.rowText, { color: themeColors.subText }]}>
+              {time ?? "Time"}
+            </Text>
           </View>
           <View style={styles.iconRow}>
-            <Ionicons name="person-outline" size={16} />
-            <Text style={styles.rowText}>
+            <Ionicons
+              name="person-outline"
+              size={16}
+              color={themeColors.text}
+            />
+            <Text style={[styles.rowText, { color: themeColors.subText }]}>
               {consultationType === "In-Person"
                 ? "In-Person Visit"
                 : "Video Call"}
@@ -83,46 +115,71 @@ const ConfirmScreen = () => {
         </View>
 
         {/* Payment Summary */}
-        <View style={styles.card}>
-          <Text style={styles.cardHeading}>Payment Summary</Text>
+        <View style={[styles.card, { backgroundColor: themeColors.subCard }]}>
+          <Text style={[styles.cardHeading, { color: themeColors.text }]}>
+            Payment Summary
+          </Text>
           <View style={styles.rowBetween}>
-            <Text style={styles.grayText}>Consultation Fee</Text>
-            <Text style={styles.feeText}>₵{consultationFee}</Text>
+            <Text style={[styles.grayText, { color: themeColors.subText }]}>
+              Consultation Fee
+            </Text>
+            <Text style={[styles.feeText, { color: themeColors.text }]}>
+              ₵{consultationFee}
+            </Text>
           </View>
           <View style={styles.rowBetween}>
-            <Text style={styles.grayText}>Platform Fee</Text>
-            <Text style={styles.feeText}>₵{platformFee}</Text>
+            <Text style={[styles.grayText, { color: themeColors.subText }]}>
+              Platform Fee
+            </Text>
+            <Text style={[styles.feeText, { color: themeColors.text }]}>
+              ₵{platformFee}
+            </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.rowBetween}>
-            <Text style={styles.totalText}>Total</Text>
-            <Text style={styles.totalText}>₵{total}</Text>
+            <Text style={[styles.totalText, { color: themeColors.text }]}>
+              Total
+            </Text>
+            <Text style={[styles.totalText, { color: themeColors.text }]}>
+              ₵{total}
+            </Text>
           </View>
         </View>
       </View>
 
       {/* Reason for Visit */}
-      <View style={styles.card}>
-        <Text style={styles.cardHeading}>Reason for Visit</Text>
+      <View style={[styles.card, { backgroundColor: themeColors.subCard }]}>
+        <Text style={[styles.cardHeading, { color: themeColors.text }]}>
+          Reason for Visit
+        </Text>
         <TextInput
           placeholder="Please describe your symptoms or reason for the appointment..."
           multiline
-          style={styles.textArea}
+          style={[styles.textArea, { color: themeColors.placeholder }]}
           value={reason}
           onChangeText={setReason}
         />
       </View>
 
       {/* Payment Methods */}
-      <View style={styles.card}>
-        <Text style={styles.cardHeading}>Payment Method</Text>
+      <View style={[styles.card, { backgroundColor: themeColors.background }]}>
+        <Text style={[styles.cardHeading, { color: themeColors.text }]}>
+          Payment Method
+        </Text>
         <View style={styles.payOptions}>
           {["MTN MoMo", "Telecel Cash", "Credit/Debit Card"].map((method) => (
             <TouchableOpacity
               key={method}
               style={[
                 styles.paymentBtn,
-                selectedMethod === method && styles.paymentBtnSelected,
+                {
+                  backgroundColor: themeColors.card,
+                  borderColor: themeColors.border,
+                },
+                selectedMethod === method && {
+                  backgroundColor: Colors.brand.primary,
+                  borderColor: "none",
+                },
               ]}
               onPress={() => setSelectedMethod(method)}
             >
@@ -133,12 +190,14 @@ const ConfirmScreen = () => {
                     : "phone-portrait-outline"
                 }
                 size={18}
-                color={selectedMethod === method ? "#fff" : "#333"}
+                color={selectedMethod === method ? "#fff" : themeColors.text}
               />
               <Text
                 style={[
                   styles.paymentBtnText,
-                  selectedMethod === method && { color: "#fff" },
+                  selectedMethod === method
+                    ? { color: "#fff" }
+                    : { color: themeColors.text },
                 ]}
               >
                 {method}
@@ -150,11 +209,20 @@ const ConfirmScreen = () => {
         {/* Payment Fields */}
         {selectedMethod === "MTN MoMo" || selectedMethod === "Telecel Cash" ? (
           <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Mobile Money Number</Text>
+            <Text style={[styles.inputLabel, { color: themeColors.text }]}>
+              Mobile Money Number
+            </Text>
             <TextInput
               placeholder="Enter mobile number"
               keyboardType="phone-pad"
-              style={styles.input}
+              style={[
+                styles.input,
+                {
+                  color: themeColors.placeholder,
+                  backgroundColor: themeColors.card,
+                  borderColor: themeColors.border,
+                },
+              ]}
             />
           </View>
         ) : null}
@@ -162,25 +230,55 @@ const ConfirmScreen = () => {
         {selectedMethod === "Credit/Debit Card" && (
           <View>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Card Number</Text>
+              <Text style={[styles.inputLabel, { color: themeColors.text }]}>
+                Card Number
+              </Text>
               <TextInput
                 placeholder="1234 5678 9012 3456"
                 keyboardType="numeric"
-                style={styles.input}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: themeColors.card,
+                    color: themeColors.placeholder,
+                    borderColor: themeColors.border,
+                  },
+                ]}
               />
             </View>
             <View style={styles.cardDetailsRow}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.inputLabel}>Expiry</Text>
-                <TextInput placeholder="MM/YY" style={styles.input} />
+                <Text style={[styles.inputLabel, { color: themeColors.text }]}>
+                  Expiry
+                </Text>
+                <TextInput
+                  placeholder="MM/YY"
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: themeColors.card,
+                      color: themeColors.placeholder,
+                      borderColor: themeColors.border,
+                    },
+                  ]}
+                />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.inputLabel}>CVV</Text>
+                <Text style={[styles.inputLabel, { color: themeColors.text }]}>
+                  CVV
+                </Text>
                 <TextInput
                   placeholder="123"
                   keyboardType="numeric"
                   secureTextEntry
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: themeColors.card,
+                      color: themeColors.placeholder,
+                      borderColor: themeColors.border,
+                    },
+                  ]}
                 />
               </View>
             </View>
@@ -189,7 +287,10 @@ const ConfirmScreen = () => {
       </View>
 
       {/* Confirm Button */}
-      <TouchableOpacity style={styles.submitBtn} onPress={handleConfirm}>
+      <TouchableOpacity
+        style={[styles.submitBtn, { backgroundColor: Colors.brand.primary }]}
+        onPress={handleConfirm}
+      >
         <Text style={styles.submitText}>Confirm & Pay ₵{total}</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -203,21 +304,13 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: 60,
     paddingHorizontal: 20,
-    backgroundColor: "#fff",
     flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
   },
   rowWrap: {
     gap: 20,
     marginBottom: 20,
   },
   card: {
-    backgroundColor: "#f9fafb",
     borderRadius: 10,
     padding: 16,
     marginBottom: 20,
@@ -237,20 +330,17 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#ddd",
     justifyContent: "center",
     alignItems: "center",
   },
   avatarText: {
     fontWeight: "600",
-    color: "#333",
   },
   docName: {
     fontWeight: "600",
     fontSize: 15,
   },
   grayText: {
-    color: "#666",
     fontSize: 13,
   },
   iconRow: {
@@ -261,7 +351,6 @@ const styles = StyleSheet.create({
   },
   rowText: {
     fontSize: 14,
-    color: "#333",
   },
   rowBetween: {
     flexDirection: "row",
@@ -275,7 +364,6 @@ const styles = StyleSheet.create({
   },
   feeText: {
     fontSize: 14,
-    color: "#111",
   },
   totalText: {
     fontSize: 15,
@@ -300,19 +388,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ccc",
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 8,
     gap: 8,
   },
-  paymentBtnSelected: {
-    backgroundColor: "#000",
-    borderColor: "#000",
-  },
   paymentBtnText: {
     fontSize: 14,
-    color: "#333",
   },
   inputGroup: {
     marginTop: 16,
@@ -321,11 +403,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "500",
     marginBottom: 6,
-    color: "#333",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 8,
     padding: 10,
     fontSize: 14,
@@ -337,7 +417,6 @@ const styles = StyleSheet.create({
   },
 
   submitBtn: {
-    backgroundColor: "#000",
     paddingVertical: 14,
     alignItems: "center",
     borderRadius: 8,
@@ -346,6 +425,5 @@ const styles = StyleSheet.create({
   submitText: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#fff",
   },
 });

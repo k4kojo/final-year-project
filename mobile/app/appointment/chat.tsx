@@ -1,4 +1,3 @@
-import Colors from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
@@ -16,7 +15,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-// Removed: import EmojiSelector from "react-native-emoji-selector";
+
+import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 
 type Message = {
   id: string;
@@ -52,6 +53,9 @@ const ChatScreen = () => {
       status: "seen",
     },
   ]);
+
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
 
   const [input, setInput] = useState("");
   // Removed: const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -112,9 +116,23 @@ const ChatScreen = () => {
   };
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (status !== "granted") {
+      Alert.alert(
+        "Permission Denied",
+        "Camera access is required to take photos."
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
     });
+
     if (!result.canceled) {
       const newMessage: Message = {
         id: Date.now().toString(),
@@ -172,12 +190,14 @@ const ChatScreen = () => {
   }, [messages]);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: Colors.brand.primary }]}>
         <TouchableOpacity onPress={() => router.push("/tabs/appointment")}>
           <Text>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
+            <Ionicons name="chevron-back" size={24} color="#fff" />
           </Text>
         </TouchableOpacity>
         <Image
@@ -221,7 +241,12 @@ const ChatScreen = () => {
               activeOpacity={0.8}
               style={[
                 styles.messageBubble,
-                msg.from === "user" ? styles.userBubble : styles.doctorBubble,
+                msg.from === "user"
+                  ? [
+                      styles.userBubble,
+                      { backgroundColor: Colors.brand.primary },
+                    ]
+                  : styles.doctorBubble,
               ]}
             >
               {msg.text && (
@@ -258,18 +283,30 @@ const ChatScreen = () => {
         </ScrollView>
 
         {/* Input */}
-        <View style={styles.inputContainer}>
-          {/* Replaced plus sign with a generic attachment icon or removed if not needed */}
-          {/* If you still want a general "plus" or "attachment" icon: */}
+        <View
+          style={[
+            styles.inputContainer,
+            {
+              backgroundColor: Colors.brand.accentDark,
+              borderColor: themeColors.border,
+            },
+          ]}
+        >
           <TouchableOpacity onPress={() => console.log("Attachment options")}>
-            <Ionicons name="attach-outline" size={24} color="#555" />
+            <Ionicons
+              name="attach-outline"
+              size={24}
+              color={themeColors.border}
+            />
           </TouchableOpacity>
-          {/* Or if you want to remove it entirely and start with the input field:
-          <View /> // An empty view to maintain spacing if needed, or remove completely
-          */}
-
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: themeColors.card,
+                borderColor: themeColors.border,
+              },
+            ]}
             value={input}
             placeholder="Type a message"
             onChangeText={(text) => {
@@ -283,13 +320,17 @@ const ChatScreen = () => {
           {input.length > 0 ? (
             // Show send button if there's text in the input
             <TouchableOpacity onPress={handleSend}>
-              <Ionicons name="send" size={24} color={Colors.primary} />
+              <Ionicons name="send" size={24} color={Colors.brand.primary} />
             </TouchableOpacity>
           ) : (
             // Show camera and mic if no text
             <>
               <TouchableOpacity onPress={pickImage}>
-                <Ionicons name="camera-outline" size={24} color="#555" />
+                <Ionicons
+                  name="camera-outline"
+                  size={24}
+                  color={themeColors.border}
+                />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleRecord}
@@ -298,7 +339,7 @@ const ChatScreen = () => {
                 <Ionicons
                   name={recording ? "stop-circle" : "mic-outline"}
                   size={24}
-                  color={recording ? "red" : "#555"}
+                  color={recording ? "red" : themeColors.border}
                 />
               </TouchableOpacity>
             </>
@@ -322,7 +363,6 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 16,
     paddingHorizontal: 16,
-    backgroundColor: Colors.primary,
   },
   avatar: {
     width: 36,
@@ -348,7 +388,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   userBubble: {
-    backgroundColor: Colors.primary,
     alignSelf: "flex-end",
     borderBottomRightRadius: 0,
   },
@@ -373,7 +412,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 12,
     paddingBottom: Platform.OS === "ios" ? 28 : 12,
-    backgroundColor: "#f1f1f1",
     borderTopWidth: 1,
     borderColor: "#ddd",
   },

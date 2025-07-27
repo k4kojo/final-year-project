@@ -9,21 +9,39 @@ import {
   View,
 } from "react-native";
 
+import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
+
 export default function SuccessScreen() {
   const router = useRouter();
 
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       {/* Success icon */}
       <View style={styles.iconWrapper}>
-        <View style={styles.checkCircle}>
-          <Feather name="check" size={50} color="#fff" />
+        <View style={styles.iconWrapperone}>
+          <View style={styles.iconWrappertwo}>
+            <View style={styles.iconWrapperthree}>
+              <View style={styles.checkCircle}>
+                <Feather name="check" size={50} color="#fff" />
+              </View>
+            </View>
+          </View>
         </View>
       </View>
 
       {/* Title and message */}
-      <Text style={styles.title}>Successfull</Text>
-      <Text style={styles.subtitle}>Your appointment has been requested</Text>
+      <Text style={[styles.title, { color: themeColors.text }]}>
+        Successfull
+      </Text>
+      <Text style={[styles.subtitle, { color: themeColors.subText }]}>
+        Your appointment has been requested
+      </Text>
 
       {/* Info box */}
       <View style={styles.infoBox}>
@@ -36,7 +54,13 @@ export default function SuccessScreen() {
 
       {/* Google Calendar Button */}
       <TouchableOpacity
-        style={styles.googleBtn}
+        style={[
+          styles.googleBtn,
+          {
+            backgroundColor: themeColors.card,
+            borderColor: themeColors.border,
+          },
+        ]}
         onPress={() =>
           Alert.alert("Google Calendar", "Will launch integration")
         }
@@ -47,7 +71,11 @@ export default function SuccessScreen() {
           }}
           style={styles.googleIcon}
         />
-        <Text style={styles.googleBtnText}>Add Google Calendar</Text>
+        <Text
+          style={[styles.googleBtnText, { color: themeColors.placeholder }]}
+        >
+          Add Google Calendar
+        </Text>
       </TouchableOpacity>
 
       {/* Back to home */}
@@ -70,7 +98,29 @@ const styles = StyleSheet.create({
     paddingTop: 100,
   },
   iconWrapper: {
+    borderWidth: 5,
+    // padding: 1,
+    borderRadius: 80,
+    borderColor: "#C9FDC7",
     marginBottom: 30,
+  },
+  iconWrapperone: {
+    borderWidth: 5,
+    // padding: 1,
+    borderRadius: 80,
+    borderColor: "#9EF0AD",
+  },
+  iconWrappertwo: {
+    borderWidth: 5,
+    // padding: 1,
+    borderRadius: 100,
+    borderColor: "#74E293",
+  },
+  iconWrapperthree: {
+    borderWidth: 5,
+    // padding: 1,
+    borderRadius: 80,
+    borderColor: "#4AD47A",
   },
   checkCircle: {
     width: 120,

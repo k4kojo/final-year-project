@@ -89,7 +89,7 @@ const ScheduleAppointment = () => {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace("/tabs/appointment")}>
-          <Ionicons name="arrow-back" size={24} color={themeColors.text} />
+          <Ionicons name="chevron-back" size={24} color={themeColors.text} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: themeColors.text }]}>
           Book Appointment
@@ -142,7 +142,12 @@ const ScheduleAppointment = () => {
                 }}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <View style={styles.avatarPlaceholder} />
+                  <View
+                    style={[
+                      styles.avatarPlaceholder,
+                      { backgroundColor: themeColors.avatar },
+                    ]}
+                  />
                   <View>
                     <Text
                       style={[styles.doctorName, { color: themeColors.text }]}

@@ -1,5 +1,6 @@
 import StepHeader from "@/components/step-header-component";
 import Colors from "@/constants/colors";
+import { useThemeContext } from "@/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -15,7 +16,10 @@ import { Calendar } from "react-native-calendars";
 const times = ["9:00 AM", "10:30 AM", "2:00 PM", "3:30 PM"];
 
 export default function SelectTimeScreen() {
+  const { theme } = useThemeContext();
+  const themeColors = Colors[theme];
   const router = useRouter();
+
   const [selectedDate, setSelectedDate] = useState("");
   const [consultationType, setConsultationType] = useState("Video");
   const [selectedTime, setSelectedTime] = useState("");
@@ -28,7 +32,6 @@ export default function SelectTimeScreen() {
       return;
     }
 
-    // You can pass all values to the next screen if needed
     router.push({
       pathname: "/appointment/confirm",
       params: {
@@ -43,109 +46,163 @@ export default function SelectTimeScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <StepHeader step={2} />
-
+    <ScrollView
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
       {/* Back Button */}
       <View style={styles.headerRow}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} />
+        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color={themeColors.text} />
+          <Text style={{ color: themeColors.text, fontSize: 18 }}>Back</Text>
         </TouchableOpacity>
       </View>
 
+      <StepHeader step={2} />
+
       {/* Doctor Info */}
-      <View style={styles.doctorCard}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{initials?.toString() ?? "Dr"}</Text>
+      <View
+        style={[
+          styles.doctorCard,
+          {
+            backgroundColor: themeColors.subCard,
+            borderColor: themeColors.border,
+          },
+        ]}
+      >
+        <View style={[styles.avatar, { backgroundColor: themeColors.avatar }]}>
+          <Text style={[styles.avatarText, { color: themeColors.text }]}>
+            {initials?.toString() ?? "Dr"}
+          </Text>
         </View>
         <View>
-          <Text style={styles.doctorName}>{name ?? "Doctor Name"}</Text>
-          <Text style={styles.specialty}>{specialty ?? "Specialty"}</Text>
+          <Text style={[styles.doctorName, { color: themeColors.text }]}>
+            {name ?? "Doctor Name"}
+          </Text>
+          <Text style={[styles.specialty, { color: themeColors.subText }]}>
+            {specialty ?? "Specialty"}
+          </Text>
         </View>
       </View>
 
       {/* Date */}
-      <Text style={styles.sectionTitle}>Select Date</Text>
-      <View style={styles.box}>
+      <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+        Select Date
+      </Text>
+      <View style={[styles.box, { backgroundColor: themeColors.subCard }]}>
         <Calendar
           minDate={new Date().toISOString().split("T")[0]}
           onDayPress={(day) => setSelectedDate(day.dateString)}
           markedDates={{
             [selectedDate]: {
               selected: true,
-              selectedColor: Colors.primary,
+              selectedColor: Colors.brand.primary,
               selectedTextColor: "white",
             },
           }}
           theme={{
-            selectedDayBackgroundColor: Colors.primary,
-            todayTextColor: Colors.primary,
+            backgroundColor: themeColors.subCard,
+            calendarBackground: themeColors.subCard,
+            dayTextColor: themeColors.text,
+            monthTextColor: themeColors.text,
+            arrowColor: Colors.brand.accent,
+            todayTextColor: Colors.brand.accent,
           }}
         />
       </View>
 
       {/* Appointment Type */}
-      <Text style={styles.sectionTitle}>Appointment Type</Text>
+      <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+        Appointment Type
+      </Text>
       <View style={styles.boxRow}>
-        {["Video", "In-Person"].map((type) => (
-          <TouchableOpacity
-            key={type}
-            onPress={() => setConsultationType(type)}
-            style={[
-              styles.consultTypeBtn,
-              consultationType === type && styles.consultTypeBtnActive,
-            ]}
-          >
-            <Ionicons
-              name={type === "Video" ? "videocam-outline" : "person-outline"}
-              color={consultationType === type ? "#fff" : "#333"}
-              size={18}
-              style={{ marginRight: 6 }}
-            />
-            <Text
+        {["Video", "In-Person"].map((type) => {
+          const isActive = consultationType === type;
+          return (
+            <TouchableOpacity
+              key={type}
+              onPress={() => setConsultationType(type)}
               style={[
-                styles.consultTypeText,
-                consultationType === type && styles.consultTypeTextActive,
+                styles.consultTypeBtn,
+                {
+                  backgroundColor: isActive
+                    ? Colors.brand.primary
+                    : themeColors.card,
+                  borderColor: isActive
+                    ? Colors.brand.primary
+                    : themeColors.border,
+                },
               ]}
             >
-              {type === "Video" ? "Video Call" : "In-Person"}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Ionicons
+                name={type === "Video" ? "videocam-outline" : "person-outline"}
+                color={isActive ? "#fff" : themeColors.text}
+                size={18}
+                style={{ marginRight: 6 }}
+              />
+              <Text
+                style={[
+                  styles.consultTypeText,
+                  {
+                    color: isActive ? "#fff" : themeColors.text,
+                  },
+                ]}
+              >
+                {type === "Video" ? "Video Call" : "In-Person"}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       {/* Time Slots */}
-      <Text style={styles.sectionTitle}>Available Times</Text>
+      <Text style={[styles.sectionTitle, { color: themeColors.text }]}>
+        Available Times
+      </Text>
       <View style={styles.timeGrid}>
-        {times.map((time) => (
-          <TouchableOpacity
-            key={time}
-            onPress={() => setSelectedTime(time)}
-            style={[
-              styles.timeBtn,
-              selectedTime === time && styles.timeBtnActive,
-            ]}
-          >
-            <Ionicons
-              name="time-outline"
-              size={16}
-              color={selectedTime === time ? "#fff" : "#333"}
-              style={{ marginRight: 6 }}
-            />
-            <Text
+        {times.map((time) => {
+          const isActive = selectedTime === time;
+          return (
+            <TouchableOpacity
+              key={time}
+              onPress={() => setSelectedTime(time)}
               style={[
-                styles.timeText,
-                selectedTime === time && styles.timeTextActive,
+                styles.timeBtn,
+                {
+                  backgroundColor: isActive
+                    ? Colors.brand.primary
+                    : themeColors.card,
+                  borderColor: isActive
+                    ? Colors.brand.primary
+                    : themeColors.border,
+                },
               ]}
             >
-              {time}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Ionicons
+                name="time-outline"
+                size={16}
+                color={isActive ? "#fff" : themeColors.text}
+                style={{ marginRight: 6 }}
+              />
+              <Text
+                style={[
+                  styles.timeText,
+                  {
+                    color: isActive ? "#fff" : themeColors.text,
+                  },
+                ]}
+              >
+                {time}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
-      {/* Continue */}
-      <TouchableOpacity style={styles.continueBtn} onPress={handleContinue}>
+      {/* Continue Button */}
+      <TouchableOpacity
+        style={[styles.continueBtn, { backgroundColor: Colors.brand.accent }]}
+        onPress={handleContinue}
+      >
         <Text style={styles.continueText}>Continue</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -156,7 +213,6 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingTop: 60,
-    backgroundColor: "#fff",
   },
   headerRow: {
     flexDirection: "row",
@@ -164,10 +220,15 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 10,
   },
+  backBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
   doctorCard: {
-    backgroundColor: "#f9fafb",
     padding: 16,
     borderRadius: 12,
+    borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -176,7 +237,6 @@ const styles = StyleSheet.create({
   avatar: {
     width: 46,
     height: 46,
-    backgroundColor: "#ddd",
     borderRadius: 23,
     justifyContent: "center",
     alignItems: "center",
@@ -184,14 +244,12 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333",
   },
   doctorName: {
     fontSize: 16,
     fontWeight: "600",
   },
   specialty: {
-    color: "#666",
     fontSize: 13,
   },
   sectionTitle: {
@@ -201,7 +259,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   box: {
-    backgroundColor: "#fff",
     borderRadius: 8,
     elevation: 2,
     shadowColor: "#000",
@@ -219,21 +276,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: "#ccc",
     borderRadius: 8,
     flexDirection: "row",
     alignItems: "center",
   },
-  consultTypeBtnActive: {
-    backgroundColor: "#000",
-    borderColor: "#000",
-  },
   consultTypeText: {
     fontSize: 14,
-    color: "#333",
-  },
-  consultTypeTextActive: {
-    color: "#fff",
   },
   timeGrid: {
     flexDirection: "row",
@@ -245,24 +293,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ccc",
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 8,
   },
-  timeBtnActive: {
-    backgroundColor: "#000",
-    borderColor: "#000",
-  },
   timeText: {
     fontSize: 14,
-    color: "#333",
-  },
-  timeTextActive: {
-    color: "#fff",
   },
   continueBtn: {
-    backgroundColor: Colors.primary,
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: "center",
