@@ -121,6 +121,7 @@ const SignUpForm = () => {
         styles.container,
         { backgroundColor: themeColors.background },
       ]}
+      showsVerticalScrollIndicator={false}
     >
       <Text style={[styles.title, { color: themeColors.text }]}>Sign Up</Text>
       <Text style={[styles.subtitle, { color: themeColors.subText }]}>

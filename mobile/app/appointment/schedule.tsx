@@ -129,6 +129,7 @@ const ScheduleAppointment = () => {
         data={filteredDoctors}
         keyExtractor={(item) => item.name}
         contentContainerStyle={{ paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <View
             style={[styles.doctorCard, { backgroundColor: themeColors.card }]}

@@ -43,6 +43,7 @@ const ConfirmScreen = () => {
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: themeColors.background }]}
+      showsVerticalScrollIndicator={false}
     >
       {/* Header */}
       <TouchableOpacity

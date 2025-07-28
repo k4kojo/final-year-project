@@ -22,6 +22,7 @@ export default function Index() {
         styles.container,
         { backgroundColor: themeColors.background },
       ]}
+      showsVerticalScrollIndicator={false}
     >
       <View style={styles.content}>
         <View style={styles.welcomeSection}>

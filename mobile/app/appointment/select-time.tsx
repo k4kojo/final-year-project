@@ -48,6 +48,7 @@ export default function SelectTimeScreen() {
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: themeColors.background }]}
+      showsVerticalScrollIndicator={false}
     >
       {/* Back Button */}
       <View style={styles.headerRow}>

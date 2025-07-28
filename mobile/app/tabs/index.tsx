@@ -92,6 +92,7 @@ const Dashboard = () => {
           styles.container,
           { backgroundColor: themeColors.background },
         ]}
+        showsVerticalScrollIndicator={false}
       >
         <WelcomeCard
           profileImage={profileImage ?? undefined}

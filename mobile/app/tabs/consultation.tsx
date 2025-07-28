@@ -1,16 +1,39 @@
+import React, { useState } from "react";
+
+import ConsultationInfo from "@/components/consultation/consultationInfo.component";
+import NotesAndRecordings from "@/components/consultation/notesAndRecordings";
+import Participants from "@/components/consultation/participants.component";
+import Tabs from "@/components/consultation/tabs.component";
 import TopHeader from "@/components/top-header.component";
 import Colors from "@/constants/colors";
 import { useThemeContext } from "@/context/ThemeContext";
+import { Ionicons } from "@expo/vector-icons";
 import {
   FlatList,
   Image,
+  Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
+const TABS = [
+  { label: "Overview" },
+  { label: "Prescriptions", count: 2 },
+  { label: "Lab Results", count: 2 },
+  { label: "Chat" },
+];
+
 const Consultation = () => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [tab, setTab] = useState(0);
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
   const upcomingConsultation = {
     doctor: "Dr. Derick Agyeman",
     specialty: "General Physician",
@@ -120,7 +143,7 @@ const Consultation = () => {
                   {item.date}
                 </Text>
               </View>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={openModal}>
                 <Text
                   style={[styles.viewSummary, { color: brandColors.primary }]}
                 >
@@ -131,6 +154,81 @@ const Consultation = () => {
           )}
         />
       </View>
+      <Modal
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <View style={styles.overlay}>
+          <View
+            style={[styles.modal, { backgroundColor: themeColors.background }]}
+          >
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={styles.closeBtn}
+            >
+              <Ionicons name="close" size={30} color={themeColors.text} />
+            </TouchableOpacity>
+            <View style={{ marginBottom: 20 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 7,
+                  marginBottom: 5,
+                  marginLeft: -5,
+                }}
+              >
+                <Ionicons
+                  name="document-text-outline"
+                  size={35}
+                  color={themeColors.text}
+                  style={{ fontWeight: "bold" }}
+                />
+                <Text
+                  style={{
+                    color: themeColors.text,
+                    fontSize: 25,
+                    fontWeight: "bold",
+                  }}
+                >
+                  Consultation Details
+                </Text>
+              </View>
+              <Text style={{ color: themeColors.subText }}>
+                Consultation with Dr. Kofi Mensah
+              </Text>
+            </View>
+
+            {/* Tab Bar */}
+            <Tabs TABS={TABS} tab={tab} setTab={setTab} />
+
+            {/* Tab Content */}
+            <ScrollView
+              style={{ flex: 1, width: "100%" }}
+              contentContainerStyle={{
+                paddingBottom: 32,
+                alignItems: "center",
+              }}
+              showsVerticalScrollIndicator={false}
+            >
+              <ConsultationInfo tab={tab} />
+              <Participants tab={tab} />
+              <NotesAndRecordings
+                tab={tab}
+                title="Clinical Notes"
+                content="Patient reports improved blood pressure readings. Continue current medication regimen. Recommended lifestyle modifications including regular exercise and reduced sodium intake. Schedule follow-up in 4 weeks."
+              />
+              <NotesAndRecordings tab={tab} title="Consultation Recordings">
+                <View style={styles.customContent}>
+                  <Text>I am tired</Text>
+                </View>
+              </NotesAndRecordings>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -207,5 +305,25 @@ const styles = StyleSheet.create({
   },
   viewSummary: {
     fontWeight: "500",
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modal: {
+    width: "100%",
+    height: "100%",
+    padding: 20,
+  },
+  closeBtn: {
+    alignSelf: "flex-end",
+  },
+  customContent: {
+    width: 328,
+    height: 100,
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 6,
   },
 });
