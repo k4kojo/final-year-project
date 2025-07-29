@@ -1,4 +1,4 @@
-export * from "./schema/appointment.js";
+export * from "./schema/appointments.js";
 export * from "./schema/chatMessages.js";
 export * from "./schema/chatRooms.js";
 export * from "./schema/doctorAvailability.js";

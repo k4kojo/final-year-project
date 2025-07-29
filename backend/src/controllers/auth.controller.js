@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
+import { db } from "../config/db.js";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
-import { db } from "../db/index.js";
 import { users } from "../db/schema.js";
 import { signInSchema, signUpSchema } from "../validators/authSchema.js";
 

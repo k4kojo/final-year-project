@@ -5,7 +5,7 @@ const JWT_ALLOWED_ALGORITHMS = ["HS256", "RS256"]; // Specify algorithms your to
 
 // Imports for database interaction (needed if fetching user from DB after token verification)
 import { eq } from "drizzle-orm";
-import { db } from "../db/index.js";
+import { db } from "../config/db.js";
 import { users } from "../db/schema.js";
 
 /**
