@@ -1,59 +1,50 @@
+import { pgTable, real, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import {
-  pgEnum,
-  pgTable,
-  real,
-  serial,
-  text,
-  timestamp,
-  uuid,
-  varchar,
-} from "drizzle-orm/pg-core";
-
-export const appointmentModeEnum = pgEnum("appointment_mode_enum", [
-  "Online",
-  "In-person",
-]);
-
-export const paymentMethodEnum = pgEnum("payment_method_enum", [
-  "MTN MoMo",
-  "Telecel Cash",
-  "AirtelTigo Cash",
-  "Credit Card",
-]);
+  appointmentModeEnum,
+  appointmentStatusEnum,
+  paymentMethodEnum,
+  paymentStatusEnum,
+} from "./enums.js";
+import { users } from "./users.js";
 
 export const appointments = pgTable("appointments", {
-  id: serial("id").primaryKey(),
-  appointmentId: uuid("appointment_id").notNull().unique(),
+  appointmentId: uuid("appointment_id").primaryKey().defaultRandom(),
 
-  patientId: uuid("patient_id").notNull(),
-  doctorId: uuid("doctor_id").notNull(),
+  // Relationships
+  patientId: uuid("patient_id")
+    .notNull()
+    .references(() => users.userId),
+  doctorId: uuid("doctor_id")
+    .notNull()
+    .references(() => users.userId),
 
+  // Appointment details
   appointmentDate: timestamp("appointment_date", {
     withTimezone: true,
     mode: "date",
   }).notNull(),
+  appointmentMode: appointmentModeEnum("appointment_mode")
+    .notNull()
+    .default("Online"),
+  reasonForVisit: varchar("reason_for_visit", { length: 500 }),
 
+  // Payment information
   appointmentAmount: real("appointment_amount").notNull(),
+  paidAmount: real("paid_amount").notNull().default(0),
+  paymentMethod: paymentMethodEnum("payment_method"),
+  paymentStatus: paymentStatusEnum("payment_status")
+    .notNull()
+    .default("pending"),
+  paymentDate: timestamp("payment_date", { withTimezone: true, mode: "date" }),
 
-  paymentMethod: paymentMethodEnum("payment_method").notNull(),
+  // Status tracking
+  status: appointmentStatusEnum("status").notNull().default("pending"),
 
-  appointmentMode: appointmentModeEnum("appointment_mode").notNull(),
-
-  reasonForVisit: varchar("reason_for_visit", { mode: "nullable" }),
-
-  status: text("status").notNull().default("pending"),
-
-  createdAt: timestamp("created_at", {
-    withTimezone: true,
-    mode: "date",
-  })
+  // Timestamps
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .notNull()
     .defaultNow(),
-
-  updatedAt: timestamp("updated_at", {
-    withTimezone: true,
-    mode: "date",
-  })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .defaultNow(),
 });

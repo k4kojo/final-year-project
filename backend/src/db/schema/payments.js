@@ -2,26 +2,30 @@ import {
   pgTable,
   real,
   serial,
-  text,
   timestamp,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { appointments } from "./appointments.js";
+import { paymentMethodEnum, paymentStatusEnum } from "./enums.js";
+import { users } from "./users.js";
 
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
+  paymentId: uuid("payment_id").notNull().unique(),
 
-  appointmentId: uuid("appointment_id").notNull(), // FK to appointments.id
+  appointmentId: uuid("appointment_id")
+    .notNull()
+    .references(() => appointments.appointmentId),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.userId),
 
-  userId: uuid("user_id").notNull(), // FK to users.id
+  amount: real("amount").notNull(),
+  status: paymentStatusEnum("status").notNull().default("pending"),
+  method: paymentMethodEnum("payment_method").default("Credit Card"),
 
-  amount: real("amount").notNull(), // Amount in smallest currency unit (e.g. cents)
-
-  status: text("status").notNull().default("pending"), // 'pending' | 'paid' | 'failed' | 'refunded'
-
-  providerRef: varchar("provider_ref", { mode: "nullable" }), // Reference ID from external provider (e.g. Stripe)
-
-  method: text("method", { mode: "nullable" }), // Payment method (e.g. card, momo, cash)
+  providerRef: varchar("provider_ref", { length: 255 }).default(""),
 
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),

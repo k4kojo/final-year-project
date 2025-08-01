@@ -1,11 +1,92 @@
-import { Router } from "express";
+import express from "express";
+import {
+  createReviews,
+  deleteReviews,
+  getAllReviews,
+  getDoctorReviews,
+  getPatientReviews,
+  getReviewsById,
+  updateReviews,
+} from "../controllers/reviews.controller.js";
+import {
+  authenticateToken,
+  authorizeRoles,
+} from "../middlewares/auth.middleware.js";
+import { validateReviewFKs } from "../middlewares/reviews/fkValidation.middleware.js";
+import {
+  checkPatientReviewsAccess,
+  checkReviewOwnership,
+} from "../middlewares/reviews/ownershipCheck.middleware.js";
+import {
+  restrictReviewModification,
+  validateReviewCreation,
+} from "../middlewares/reviews/roleCheck.middleware.js";
+import { validateBody } from "../middlewares/validate.middleware.js";
+import { reviewSchema } from "../validators/reviewsSchema.js";
 
-const reviewsRouter = Router();
+const reviewsRouter = express.Router();
 
-reviewsRouter.get("/doctors/:doctorId/reviews"); // Get all reviews for a specific doctor
-reviewsRouter.get("/reviews/:id"); // Get a single review by ID
-reviewsRouter.post("/doctors/:doctorId/reviews"); // Submit a new review for a doctor
-reviewsRouter.put("/reviews/:id"); // Update an existing review by ID
-reviewsRouter.delete("/reviews/:id"); // Delete a review by ID
+// Admin routes
+reviewsRouter.get(
+  "/",
+  authenticateToken,
+  authorizeRoles("admin"),
+  getAllReviews
+);
+
+// Doctor routes
+reviewsRouter.get(
+  "/doctor",
+  authenticateToken,
+  authorizeRoles("doctor"),
+  getDoctorReviews
+);
+
+// Patient routes
+reviewsRouter.get(
+  "/patient",
+  authenticateToken,
+  authorizeRoles("patient"),
+  checkPatientReviewsAccess,
+  getPatientReviews
+);
+
+reviewsRouter.post(
+  "/",
+  authenticateToken,
+  authorizeRoles("patient"),
+  validateBody(reviewSchema),
+  validateReviewFKs,
+  validateReviewCreation,
+  createReviews
+);
+
+// Shared routes
+reviewsRouter.get(
+  "/:id",
+  authenticateToken,
+  authorizeRoles("admin", "doctor", "patient"),
+  checkReviewOwnership,
+  getReviewsById
+);
+
+reviewsRouter.put(
+  "/:id",
+  authenticateToken,
+  authorizeRoles("admin", "patient"),
+  checkReviewOwnership,
+  restrictReviewModification,
+  validateBody(reviewSchema.partial()),
+  updateReviews
+);
+
+reviewsRouter.delete(
+  "/:id",
+  authenticateToken,
+  authorizeRoles("admin", "patient"),
+  checkReviewOwnership,
+  restrictReviewModification,
+  deleteReviews
+);
 
 export default reviewsRouter;

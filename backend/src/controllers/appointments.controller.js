@@ -1,299 +1,161 @@
 import { and, eq } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
 import { db } from "../config/db.js";
 import { appointments } from "../db/schema/appointments.js";
-import {
-  appointmentSchema,
-  isValidId,
-} from "../validators/appointment.validator.js";
-
-const log = (controllerName, step, message) => {
-  console.log(`[${controllerName}] - ${step}: ${message}`);
-};
+import { appointmentSchema } from "../validators/appointmentsSchema.js";
 
 export const getAllAppointments = async (req, res) => {
-  const controllerName = "getAllAppointments";
-  log(controllerName, "Start", "Received request to get all appointments.");
+  const { role, userId } = req.user;
+  const { status, doctorId, patientId } = req.query;
+
   try {
-    const { patientId, doctorId } = req.query;
-    log(
-      controllerName,
-      "Input Parsing",
-      `Query params - patientId: ${patientId}, doctorId: ${doctorId}`
-    );
+    console.log("➡️  getAllAppointments called with role:", role);
+    let conditions = [];
 
-    // Validate input
-    if (patientId && !isValidId(patientId)) {
-      log(controllerName, "Validation Error", "Invalid patientId provided.");
-      return res.status(400).json({ error: "Invalid patient ID" });
-    }
-    if (doctorId && !isValidId(doctorId)) {
-      log(controllerName, "Validation Error", "Invalid doctorId provided.");
-      return res.status(400).json({ error: "Invalid doctor ID" });
-    }
-    log(controllerName, "Validation", "Input parameters validated.");
-
-    // Build query
-    let query = db.select().from(appointments);
-    if (patientId && doctorId) {
-      query = query.where(
-        and(
-          eq(appointments.patientId, patientId),
-          eq(appointments.doctorId, doctorId)
-        )
-      );
-    } else if (patientId) {
-      query = query.where(eq(appointments.patientId, patientId));
-    } else if (doctorId) {
-      query = query.where(eq(appointments.doctorId, doctorId));
+    if (role === "doctor") {
+      console.log("🔐 Restricting results to doctor:", userId);
+      conditions.push(eq(appointments.doctorId, userId));
+    } else if (role === "patient") {
+      console.log("🔐 Restricting results to patient:", userId);
+      conditions.push(eq(appointments.patientId, userId));
+    } else if (role !== "admin") {
+      console.warn("🚫 Forbidden: Non-admin/non-owner trying to access");
+      return res.status(403).json({ error: "Forbidden" });
     }
 
-    log(
-      controllerName,
-      "Data Fetch",
-      "Attempting to fetch appointments from database..."
-    );
-    const result = await query;
-    log(controllerName, "Data Fetch", `Found ${result.length} appointments.`);
-    res.status(200).json(result);
+    if (status) {
+      console.log("🔍 Filtering by status:", status);
+      conditions.push(eq(appointments.status, status));
+    }
+    if (doctorId && role === "admin") {
+      console.log("🔍 Admin filtering by doctorId:", doctorId);
+      conditions.push(eq(appointments.doctorId, doctorId));
+    }
+    if (patientId && role === "admin") {
+      console.log("🔍 Admin filtering by patientId:", patientId);
+      conditions.push(eq(appointments.patientId, patientId));
+    }
+
+    console.log("📦 Fetching appointments...");
+    const result = await db
+      .select()
+      .from(appointments)
+      .where(conditions.length ? and(...conditions) : undefined);
+
+    console.log(`✅ Fetched ${result.length} appointments`);
+    res.json(result);
   } catch (error) {
-    log(
-      controllerName,
-      "Error",
-      `An unexpected error occurred: ${error.message}`
-    );
+    console.error("❌ Error in getAllAppointments:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
 export const getAppointmentById = async (req, res) => {
-  const controllerName = "getAppointmentById";
-  log(controllerName, "Start", "Received request to get appointment by ID.");
   try {
-    const { id } = req.params;
-    log(controllerName, "Input Parsing", `Appointment ID: ${id}`);
-
-    if (!isValidId(id)) {
-      log(
-        controllerName,
-        "Validation Error",
-        "Invalid appointment ID provided."
-      );
-      return res.status(400).json({ error: "Invalid appointment ID" });
-    }
-    log(controllerName, "Validation", "Appointment ID validated.");
-
-    const result = await db
-      .select()
-      .from(appointments)
-      .where(eq(appointments.id, Number(id)));
-    if (!result.length) {
-      log(
-        controllerName,
-        "Data Not Found",
-        `Appointment with ID ${id} not found.`
-      );
-      return res.status(404).json({ error: "Appointment not found" });
-    }
-    log(controllerName, "Data Fetch", "Appointment found.");
-    res.status(200).json(result[0]);
+    console.log("➡️  getAppointmentById:", req.appointment?.appointmentId);
+    res.json(req.appointment);
   } catch (error) {
-    log(
-      controllerName,
-      "Error",
-      `An unexpected error occurred: ${error.message}`
-    );
+    console.error("❌ Error in getAppointmentById:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
 export const createAppointment = async (req, res) => {
-  const controllerName = "createAppointment";
+  const { role, userId } = req.user;
+  let body = req.body;
 
-  log(controllerName, "Validation", "Zod schema parsing attempted");
-  const parsed = appointmentSchema.safeParse(req.body);
+  console.log("➡️  createAppointment called by", role);
 
+  if (role === "patient") {
+    console.log("🧾 Setting patientId to self:", userId);
+    body = { ...body, patientId: userId };
+  }
+
+  if (role === "admin" && !body.patientId) {
+    console.warn("⚠️  Admin did not provide patientId");
+    return res.status(400).json({ error: "patientId is required for admin" });
+  }
+
+  const parsed = appointmentSchema.safeParse(body);
   if (!parsed.success) {
-    log(controllerName, "Validation failed. Errors:", parsed.error.errors);
+    console.warn("❌ Input validation failed:", parsed.error.errors);
     return res.status(400).json({ error: parsed.error.errors });
   }
-  log(controllerName, "Request body validated successfully.");
 
-  log(controllerName, "Start", "Received request to create a new appointment.");
   try {
-    const {
-      patientId,
-      doctorId,
-      appointmentDate,
-      appointmentMode,
-      appointmentAmount,
-      paymentMethod,
-      reasonForVisit,
-      status,
-    } = req.body;
-    log(
-      controllerName,
-      "Input Parsing",
-      `Request body: ${JSON.stringify(req.body)}`
-    );
-
-    if (
-      !patientId ||
-      !doctorId ||
-      !appointmentDate ||
-      !appointmentMode ||
-      !appointmentAmount ||
-      !paymentMethod
-    ) {
-      log(
-        controllerName,
-        "Validation Error",
-        "Missing required fields for appointment."
-      );
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-    if (!isValidId(patientId) || !isValidId(doctorId)) {
-      log(controllerName, "Validation Error", "Invalid patientId or doctorId.");
-      return res.status(400).json({ error: "Invalid patient or doctor ID" });
-    }
-    log(controllerName, "Validation", "Appointment data validated.");
-
-    const appointmentId = uuidv4();
-
-    const [newAppointment] = await db
+    console.log("🛠 Inserting appointment...");
+    const [appointment] = await db
       .insert(appointments)
       .values({
-        appointmentId,
-        patientId,
-        doctorId,
-        appointmentDate: new Date(appointmentDate),
-        appointmentMode,
-        appointmentAmount,
-        paymentMethod,
-        reasonForVisit,
-        status: status || "pending",
+        ...parsed.data,
+        appointmentId: crypto.randomUUID(),
+        status: "pending",
       })
       .returning();
 
-    log(
-      controllerName,
-      "Data Save",
-      `New appointment created with ID: ${newAppointment.id}`
-    );
-    res.status(201).json(newAppointment);
+    console.log("✅ Appointment created with ID:", appointment.appointmentId);
+    res.status(201).json(appointment);
   } catch (error) {
-    log(
-      controllerName,
-      "Error",
-      `An unexpected error occurred: ${error.message}`
-    );
+    console.error("❌ Error in createAppointment:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
 export const updateAppointment = async (req, res) => {
-  const controllerName = "updateAppointment";
-  log(controllerName, "Start", "Received request to update an appointment.");
+  const { id } = req.params;
+  const { role, userId } = req.user;
+  const appointment = req.appointment;
+
+  console.log("➡️  updateAppointment called for ID:", id);
+
+  if (role !== "admin" && userId !== appointment.doctorId) {
+    console.warn("🚫 Unauthorized update attempt by user:", userId);
+    return res.status(403).json({ error: "Unauthorized update" });
+  }
+
+  const parsed = appointmentSchema.partial().safeParse(req.body);
+  if (!parsed.success) {
+    console.warn("❌ Input validation failed:", parsed.error.errors);
+    return res.status(400).json({ error: parsed.error.errors });
+  }
+
   try {
-    const { id } = req.params;
-    const updates = req.body;
-    log(
-      controllerName,
-      "Input Parsing",
-      `Appointment ID: ${id}, Updates: ${JSON.stringify(updates)}`
-    );
-
-    if (!isValidId(id)) {
-      log(
-        controllerName,
-        "Validation Error",
-        "Invalid appointment ID provided."
-      );
-      return res.status(400).json({ error: "Invalid appointment ID" });
-    }
-    if (Object.keys(updates).length === 0) {
-      log(controllerName, "Validation Error", "No update data provided.");
-      return res.status(400).json({ error: "No update data provided" });
-    }
-    log(controllerName, "Validation", "Input validated for update.");
-
-    // FIX: Convert date string to Date object
-    if (updates.appointmentDate) {
-      updates.appointmentDate = new Date(updates.appointmentDate);
-    }
-
-    const [updatedAppointment] = await db
+    console.log("🛠 Updating appointment...");
+    const [updated] = await db
       .update(appointments)
-      .set(updates)
-      .where(eq(appointments.id, Number(id)))
+      .set({
+        ...parsed.data,
+        updatedAt: new Date(),
+      })
+      .where(eq(appointments.appointmentId, id))
       .returning();
 
-    if (!updatedAppointment) {
-      log(
-        controllerName,
-        "Data Not Found",
-        `Appointment with ID ${id} not found for update.`
-      );
-      return res.status(404).json({ error: "Appointment not found" });
-    }
-    log(
-      controllerName,
-      "Data Update",
-      `Appointment with ID ${id} updated successfully.`
-    );
-    res.status(200).json(updatedAppointment);
+    console.log("✅ Appointment updated:", updated.appointmentId);
+    res.json(updated);
   } catch (error) {
-    log(
-      controllerName,
-      "Error",
-      `An unexpected error occurred: ${error.message}`
-    );
+    console.error("❌ Error in updateAppointment:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
 export const deleteAppointment = async (req, res) => {
-  const controllerName = "deleteAppointment";
-  log(controllerName, "Start", "Received request to delete an appointment.");
+  const { id } = req.params;
+  const { role, userId } = req.user;
+  const appointment = req.appointment;
+
+  console.log("➡️  deleteAppointment called for ID:", id);
+
+  if (role !== "admin" && userId !== appointment.doctorId) {
+    console.warn("🚫 Unauthorized delete attempt by user:", userId);
+    return res.status(403).json({ error: "Unauthorized delete" });
+  }
+
   try {
-    const { id } = req.params;
-    log(controllerName, "Input Parsing", `Appointment ID: ${id}`);
-
-    if (!isValidId(id)) {
-      log(
-        controllerName,
-        "Validation Error",
-        "Invalid appointment ID provided."
-      );
-      return res.status(400).json({ error: "Invalid appointment ID" });
-    }
-    log(controllerName, "Validation", "Appointment ID validated.");
-
-    const [deletedAppointment] = await db
-      .delete(appointments)
-      .where(eq(appointments.id, Number(id)))
-      .returning();
-
-    if (!deletedAppointment) {
-      log(
-        controllerName,
-        "Data Not Found",
-        `Appointment with ID ${id} not found for deletion.`
-      );
-      return res.status(404).json({ error: "Appointment not found" });
-    }
-    log(
-      controllerName,
-      "Data Delete",
-      `Appointment with ID ${id} deleted successfully.`
-    );
+    console.log("🗑 Deleting appointment...");
+    await db.delete(appointments).where(eq(appointments.appointmentId, id));
+    console.log("✅ Appointment deleted:", id);
     res.status(204).send();
   } catch (error) {
-    log(
-      controllerName,
-      "Error",
-      `An unexpected error occurred: ${error.message}`
-    );
+    console.error("❌ Error in deleteAppointment:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

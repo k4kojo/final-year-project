@@ -6,11 +6,14 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
+import { users } from "./users.js";
 
 export const userSettings = pgTable("user_settings", {
-  id: serial("id").primaryKey(),
+  id: serial("id"),
 
-  userId: uuid("user_id").notNull().unique(), // Unique to ensure one settings record per user
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.userId), // Unique to ensure one settings record per user
 
   notificationEnabled: boolean("notification_enabled").notNull().default(true),
 

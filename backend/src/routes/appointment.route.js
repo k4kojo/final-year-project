@@ -1,3 +1,4 @@
+// appointment.route.js
 import { Router } from "express";
 import {
   createAppointment,
@@ -6,27 +7,44 @@ import {
   getAppointmentById,
   updateAppointment,
 } from "../controllers/appointments.controller.js";
-import {
-  authenticateToken,
-  authorizeRoles,
-} from "../middleware/auth.middleware.js";
+import { validateAppointmentAccess } from "../middlewares/appointments/appointmentAccess.middleware.js";
+import { checkAppointmentOwnership } from "../middlewares/appointments/appointmentOwnership.middleware.js";
+import { validateDoctorExists } from "../middlewares/appointments/doctorExists.middleware.js";
+import { validatePatientExists } from "../middlewares/appointments/patientExists.middleware.js";
+import { authenticateToken } from "../middlewares/auth.middleware.js";
 
 const appointmentRouter = Router();
 
+appointmentRouter.use(authenticateToken);
+
 appointmentRouter.get(
   "/",
-  authenticateToken,
-  authorizeRoles("admin"),
+  validateAppointmentAccess(["admin", "doctor", "patient"]),
   getAllAppointments
-); // /api/appointments?patientId=...&doctorId=...
-appointmentRouter.get(
+);
+
+appointmentRouter.get("/:id", checkAppointmentOwnership, getAppointmentById);
+
+appointmentRouter.post(
+  "/",
+  validateAppointmentAccess(["patient", "admin"]), // Allow admin to create appointments
+  validateDoctorExists,
+  validatePatientExists, // Only used when admin creates appointment
+  createAppointment
+);
+
+appointmentRouter.put(
   "/:id",
-  authenticateToken,
-  authorizeRoles("admin"),
-  getAppointmentById
-); // /api/appointments/:id
-appointmentRouter.post("/", createAppointment); // /api/appointments
-appointmentRouter.put("/:id", updateAppointment); // /api/appointments/:id
-appointmentRouter.delete("/:id", deleteAppointment); // /api/appointments/:id
+  checkAppointmentOwnership,
+  validateAppointmentAccess(["admin", "doctor"]),
+  updateAppointment
+);
+
+appointmentRouter.delete(
+  "/:id",
+  checkAppointmentOwnership,
+  validateAppointmentAccess(["admin", "doctor"]),
+  deleteAppointment
+);
 
 export default appointmentRouter;

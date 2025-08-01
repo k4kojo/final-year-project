@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "seed": "node src/db/seeds/index.js",
+    "seed:dev": "npm run seed",
+    "seed:test": "npm run seed"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +28,7 @@
     "zod": "^4.0.10"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
     "drizzle-kit": "^0.31.4",
     "nodemon": "^3.1.10"
   }

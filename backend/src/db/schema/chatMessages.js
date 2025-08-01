@@ -6,14 +6,20 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { chatRooms } from "./chatRooms.js";
+import { users } from "./users.js";
 
 export const chatMessages = pgTable("chat_messages", {
   id: serial("id").primaryKey(),
 
-  chatRoomId: uuid("chat_room_id").notNull(), // FK to chat_rooms
-  senderId: uuid("sender_id").notNull(), // FK to users
+  chatRoomId: uuid("chat_room_id")
+    .notNull()
+    .references(() => chatRooms.chatRoomId), // FK to chat_rooms
+  senderId: uuid("sender_id")
+    .notNull()
+    .references(() => users.userId), // FK to users
 
-  content: varchar("content").notNull(),
+  content: varchar("content", { length: 2000 }).notNull(),
 
   createdAt: timestamp("created_at", {
     withTimezone: true,

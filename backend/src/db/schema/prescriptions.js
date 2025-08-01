@@ -6,14 +6,20 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { appointments } from "./appointments.js";
+import { users } from "./users.js";
 
 export const prescriptions = pgTable("prescriptions", {
   id: serial("id").primaryKey(),
 
-  appointmentId: uuid("appointment_id").notNull(), // FK to appointments.id
+  appointmentId: uuid("appointment_id")
+    .notNull()
+    .references(() => appointments.appointmentId), // FK to appointments.id
 
   // FK to doctors.id (or users.id if you don’t separate doctor users)
-  doctorId: uuid("doctor_id").notNull(),
+  doctorId: uuid("doctor_id")
+    .notNull()
+    .references(() => users.userId),
 
   medication: varchar("medication").notNull(), // Comma-separated or structured medication field
 
