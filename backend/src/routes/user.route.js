@@ -4,6 +4,8 @@ import {
   getAllUsers,
   getUserById,
   requestPasswordReset,
+  resendResetToken,
+  resendVerification,
   resetPassword,
   signIn,
   signUp,
@@ -24,6 +26,7 @@ const userRouter = Router();
 // Public routes
 userRouter.post("/sign-up", validateBody(signUpSchema), signUp);
 userRouter.get("/verify-email", verifyEmail);
+userRouter.get("/resend-verification", resendVerification);
 userRouter.post("/sign-in", validateBody(signInSchema), signIn);
 
 // Protected routes
@@ -46,8 +49,16 @@ userRouter.delete(
   deleteUserById
 );
 
-userRouter.post("/request-password-reset", requestPasswordReset);
-
-userRouter.post("/reset-password", resetPassword);
+userRouter.post(
+  "/request-password-reset",
+  authenticateToken,
+  requestPasswordReset
+);
+userRouter.post("/reset-password", authenticateToken, resetPassword);
+userRouter.post(
+  "/resend-request-password-reset",
+  authenticateToken,
+  resendResetToken
+);
 
 export default userRouter;

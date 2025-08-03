@@ -1,5 +1,7 @@
 import express from "express";
 
+import { PORT } from "./config/env.js";
+
 import appointmentRouter from "./routes/appointment.route.js";
 import chatMessagesRouter from "./routes/chat-message.route.js";
 import chatRoomsRouter from "./routes/chat-rooms.route.js";
@@ -15,8 +17,6 @@ import userActivityLogsRouter from "./routes/user-activity-log.route.js";
 import userSettingsRouter from "./routes/user-settings.route.js";
 import userRouter from "./routes/user.route.js";
 import userFeedbacksRouter from "./routes/userFeedbacks.route.js";
-
-import { PORT } from "./config/env.js";
 
 const app = express();
 app.use(express.json());

@@ -2,7 +2,12 @@ import { z } from "zod";
 
 const paymentStatuses = ["pending", "completed", "failed", "refunded"];
 
-const paymentMethods = ["Credit Card", "Mobile Money", "Insurance"];
+const paymentMethods = [
+  "Credit Card",
+  "MTN MoMo",
+  "Telecel Cash",
+  "AirtelTigo Cash",
+];
 
 export const paymentSchema = z.object({
   appointmentId: z.string().uuid(),

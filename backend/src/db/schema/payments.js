@@ -25,7 +25,7 @@ export const payments = pgTable("payments", {
   status: paymentStatusEnum("status").notNull().default("pending"),
   method: paymentMethodEnum("payment_method").default("Credit Card"),
 
-  providerRef: varchar("provider_ref", { length: 255 }).default(""),
+  providerRef: varchar("provider_ref", { length: 255 }).unique().default(""),
 
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),

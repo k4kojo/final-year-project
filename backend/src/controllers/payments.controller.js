@@ -49,29 +49,79 @@ export const getPaymentById = async (req, res) => {
 
 export const createPayment = async (req, res) => {
   const controllerName = "createPayment";
-  log(controllerName, "Start", "Creating payment.");
+  log(controllerName, "Start", "Creating payment", {
+    body: req.body,
+    user: req.user,
+  });
 
   try {
+    // Validate required fields
+    if (
+      !req.body.appointmentId ||
+      !req.body.userId ||
+      !req.body.amount ||
+      !req.body.method
+    ) {
+      log(controllerName, "Validation", "Missing required fields");
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Ensure patient can't set status to anything other than pending
+    const status =
+      req.user.role === "admin" ? req.body.status || "pending" : "pending";
+
     const paymentId = uuidv4();
-    const [payment] = await db
-      .insert(payments)
-      .values({
-        paymentId,
-        ...req.body,
-        // Ensure patients can't set status
-        status: req.user.role === "admin" ? req.body.status : "pending",
-      })
-      .returning();
+    const paymentData = {
+      paymentId,
+      appointmentId: req.body.appointmentId,
+      userId: req.body.userId,
+      amount: req.body.amount,
+      method: req.body.method,
+      status,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const [payment] = await db.insert(payments).values(paymentData).returning();
+
+    if (!payment) {
+      log(controllerName, "Error", "Payment creation failed");
+      return res.status(500).json({ error: "Payment creation failed" });
+    }
 
     log(
       controllerName,
       "Success",
-      `Created payment with id: ${payment.paymentId}`
+      `Created payment with id: ${payment.paymentId}`,
+      payment
     );
-    res.status(201).json(payment);
+    res.status(201).json({
+      paymentId: payment.paymentId,
+      appointmentId: payment.appointmentId,
+      userId: payment.userId,
+      amount: payment.amount,
+      method: payment.method,
+      status: payment.status,
+      createdAt: payment.createdAt,
+    });
   } catch (error) {
-    log(controllerName, "Error", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    log(controllerName, "Error", error.message, { stack: error.stack });
+
+    if (error.code === "23505") {
+      // Unique violation
+      return res.status(409).json({ error: "Payment already exists" });
+    }
+    if (error.code === "23503") {
+      // Foreign key violation
+      return res
+        .status(400)
+        .json({ error: "Invalid appointment or user reference" });
+    }
+
+    res.status(500).json({
+      error: "Internal server error",
+      ...(process.env.NODE_ENV === "development" && { details: error.message }),
+    });
   }
 };
 
