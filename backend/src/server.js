@@ -2,6 +2,7 @@ import express from "express";
 
 import { PORT } from "./config/env.js";
 
+import arcjetMiddleware from "./middlewares/arcjet.middleware.js";
 import appointmentRouter from "./routes/appointment.route.js";
 import chatMessagesRouter from "./routes/chat-message.route.js";
 import chatRoomsRouter from "./routes/chat-rooms.route.js";
@@ -20,6 +21,7 @@ import userFeedbacksRouter from "./routes/userFeedbacks.route.js";
 
 const app = express();
 app.use(express.json());
+app.use(arcjetMiddleware);
 
 app.get("/", (req, res) => {
   res.status(200).json({ success: true });
