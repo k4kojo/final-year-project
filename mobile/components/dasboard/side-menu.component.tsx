@@ -82,7 +82,7 @@ const MenuSection = ({ themeColors, brandColors }: any) => (
       themeColors={themeColors}
     />
 
-    <MenuButton label="Notifications" themeColors={themeColors} />
+    <MenuButton icon="" label="Notifications" themeColors={themeColors} />
 
     <MenuButton
       icon="settings-outline"

@@ -11,6 +11,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
+  PanResponder,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -18,6 +19,8 @@ import {
 } from "react-native";
 
 const { width } = Dimensions.get("window");
+const SWIPE_THRESHOLD = 50; // Minimum swipe distance to trigger menu
+const SWIPE_VELOCITY_THRESHOLD = 0.3; // Minimum swipe velocity to trigger menu
 
 const Dashboard = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -51,7 +54,7 @@ const Dashboard = () => {
     setMenuVisible(true);
     Animated.timing(menuSlide, {
       toValue: width - width / 1.5,
-      duration: 300,
+      duration: 200,
       useNativeDriver: false,
     }).start();
   };
@@ -66,8 +69,40 @@ const Dashboard = () => {
     });
   };
 
+  // Create pan responder for swipe gestures
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return gestureState.dx > 0 && gestureState.moveX < 20 && !menuVisible;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        // Dynamically update menuSlide to follow the finger
+        const newPosition = width - gestureState.dx;
+        const clamped = Math.min(
+          width,
+          Math.max(width - width / 1.5, newPosition)
+        );
+        menuSlide.setValue(clamped);
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (
+          gestureState.dx > SWIPE_THRESHOLD ||
+          gestureState.vx > SWIPE_VELOCITY_THRESHOLD
+        ) {
+          openMenu();
+        } else {
+          closeMenu();
+        }
+      },
+    })
+  ).current;
+
   return (
-    <View style={{ flex: 1, backgroundColor: themeColors.background }}>
+    <View
+      style={{ flex: 1, backgroundColor: themeColors.background }}
+      {...panResponder.panHandlers}
+    >
       <TopHeader
         screen="home"
         onLeftPress={openMenu}
@@ -93,6 +128,7 @@ const Dashboard = () => {
           { backgroundColor: themeColors.background },
         ]}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={!menuVisible}
       >
         <WelcomeCard
           profileImage={profileImage ?? undefined}
